@@ -6,7 +6,7 @@ import math
 driver = webdriver.Chrome()
 driver.get("https://m.place.naver.com/place/1342356243/review/ugc?entry=pll&zoomLevel=12.000&type=photoView")
 
-driver.implicitly_wait(0.5)
+driver.implicitly_wait(1)
 
 findBlogReviewString = "블로그리뷰"
 findSeparator = " "
@@ -24,12 +24,13 @@ def findTotal():
     return totalCount
 
 
-def allDisplay(clickNumber):
+def allShowDisplay(clickNumber):
     # 더보기 없어질 때 까지 계속하기
     for _ in range(clickNumber):
         driver.implicitly_wait(1)
         aTag = driver.find_element(By.CLASS_NAME, "fvwqf")
         aTag.click()
+
 
 def getClickNumber(totalCount):
     return math.ceil(int(totalCount) / 10)
@@ -37,6 +38,6 @@ def getClickNumber(totalCount):
 
 totalCount = findTotal()
 clickNumber = getClickNumber(totalCount)
-allDisplay(clickNumber)
+allShowDisplay(clickNumber)
 
 driver.quit()
