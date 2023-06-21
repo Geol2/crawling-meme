@@ -6,6 +6,18 @@ use python
 
 ```shell
 # mac, linux
+apt update
+apt install python3-
+apt-get install python3-pip
+
+# linux
+python3 -m venv .venv/{project-name}
+.venv/{project-name}/bin/pip install selenium
+
+source .venv/bin/activate
+python3 -m pip install selenium
+pip install webdriver-manager
+
 pip install selenium
 pip install --upgrade pip
 

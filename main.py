@@ -4,11 +4,16 @@ from selenium.webdriver.common.by import By
 import math
 import time
 
+
 blog_review_string = "블로그리뷰"
 separator = " "
 wait_time = 1
+data_list = []
 
-driver = webdriver.Chrome()
+option = webdriver.ChromeOptions()
+option.add_argument('--headless')
+
+driver = webdriver.Chrome(options=option)
 driver.implicitly_wait(wait_time)
 driver.get("https://m.place.naver.com/place/1342356243/review/ugc?entry=pll&zoomLevel=12.000&type=photoView")
 
@@ -47,5 +52,7 @@ def get_click_number(total_count):
 totalCount = find_total()
 clickNumber = get_click_number(totalCount)
 showCount = show_blog_list(clickNumber)
+
+print("OK")
 
 driver.quit()
