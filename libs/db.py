@@ -3,7 +3,9 @@ from . import config
 
 
 class MySQL:
-    def connect(self):
+
+    @staticmethod
+    def connect():
         try:
             connection = pymysql.connect(
                 user=config.user, password=config.password, host=config.host, database=config.database,
@@ -15,15 +17,14 @@ class MySQL:
             print("접속 중 예외가 발생했습니다.")
             exit(0)
 
-    def close(self, cursor):
+    def get_tennis_info(self):
+        query = "SELECT * FROM tb_tennis_info"
+        cursor.execute(query)
+        data = cursor.fetchall()
+        for row in data:
+            print(row)
         cursor.close()
 
 
 mysql = MySQL()
 cursor = mysql.connect()
-data_length = cursor.execute("SELECT * FROM tb_user_login")
-data = cursor.fetchall()
-for row in data:
-    print(row)
-
-mysql.close(cursor)
