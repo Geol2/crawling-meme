@@ -3,6 +3,9 @@ use python
 
 1. python 3.8 & 3.9
 2. pip ([get-pip.py](https://bootstrap.pypa.io/get-pip.py))
+3. chrome
+4. webdriver-manager
+5. selenium
 
 ```shell
 # mac, linux
