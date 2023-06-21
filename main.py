@@ -12,9 +12,9 @@ wait_time = 1
 data_list = []
 
 option = webdriver.ChromeOptions()
-option.add_argument('--headless')
-option.add_argument('--no-sandbox')
-option.add_argument('--disable-dev-shm-usage')
+#option.add_argument('--headless')
+#option.add_argument('--no-sandbox')
+#option.add_argument('--disable-dev-shm-usage')
 
 service = Service(executable_path="D:\project\crawling-meme\chromedriver.exe")
 
@@ -55,10 +55,23 @@ def get_click_number(total_count):
     return math.ceil(int(total_count) / 10) - 1
 
 
+def find_title():
+    seq = 1
+    review_list = driver.find_elements(By.CLASS_NAME, "place_bluelink")
+    review_list_count = len(review_list)
+    for i in range(review_list_count):
+        if (i == 0 or i == 1):  # 방문자수 / 리뷰수
+            continue
+        print(str(seq) + " : " + review_list[i].text)
+        seq += 1
+    return
+
+
 totalCount = find_total()
 clickNumber = get_click_number(totalCount)
 showCount = show_blog_list(clickNumber)
+find_title()
 
-print("OK")
+print("END CRAWLING")
 
 driver.quit()
