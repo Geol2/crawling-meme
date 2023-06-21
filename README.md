@@ -14,11 +14,11 @@ apt install python3-
 apt-get install python3-pip
 
 # linux
-python3 -m venv .venv/{project-name}
-.venv/{project-name}/bin/pip install selenium
+python3 -m venv .venv/{project-name} # 프로젝트별 모듈 지정
+.venv/{project-name}/bin/pip install selenium # 해당 프로젝트의 pip 모듈 설치
 
 
-source .venv/bin/activate
+source .venv/bin/activate # (.venv) 진입
 python3 -m pip install selenium
 pip install webdriver-manager
 
@@ -39,4 +39,10 @@ pip install --upgrade pip
 
 ```text
 ChromeDriver 114.0.5735.90
+```
+
+## pymysql 설치
+
+```text
+pip install pymysql
 ```
