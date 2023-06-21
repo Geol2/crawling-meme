@@ -1,6 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 
 import math
 import time
@@ -13,9 +13,12 @@ data_list = []
 
 option = webdriver.ChromeOptions()
 option.add_argument('--headless')
+option.add_argument('--no-sandbox')
+
+service = Service(executable_path="D:\project\crawling-meme\chromedriver.exe")
 
 # driver = webdriver.Chrome()
-driver = webdriver.Chrome( ChromeDriverManager().install() )
+driver = webdriver.Chrome(option, service)
 driver.implicitly_wait(wait_time)
 driver.get("https://m.place.naver.com/place/1342356243/review/ugc?entry=pll&zoomLevel=12.000&type=photoView")
 

@@ -14,9 +14,14 @@ apt-get install python3-pip
 python3 -m venv .venv/{project-name}
 .venv/{project-name}/bin/pip install selenium
 
+
 source .venv/bin/activate
 python3 -m pip install selenium
 pip install webdriver-manager
+
+# 크롬 설치
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
 
 pip install selenium
 pip install --upgrade pip
