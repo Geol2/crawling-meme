@@ -25,6 +25,8 @@ class MySQL:
             print(row)
         cursor.close()
 
+        return data
+
 
 mysql = MySQL()
 cursor = mysql.connect()

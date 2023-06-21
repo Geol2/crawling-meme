@@ -13,4 +13,3 @@ tennis_info = db.mysql.get_tennis_info()
 print("END CRAWLING")
 
 crawl.driver.quit()
-db.mysql.close()
