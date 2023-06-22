@@ -2,7 +2,7 @@ import string
 
 import pymysql
 from . import config
-
+from libs import common
 
 class MySQL:
 
@@ -17,7 +17,8 @@ class MySQL:
             cursor = connection.cursor()
             return cursor
         except Exception as e:
-            print("접속 중 예외가 발생했습니다.")
+            print(e)
+            common.logger.info(e)
             exit(0)
 
     def get_tennis_info(self, cursor):
