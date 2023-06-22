@@ -44,6 +44,7 @@ for i in range(tennis_info_length):
             common.logger.info("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + url + " 등록된 리뷰 블로그가 이미 존재합니다.")
             continue
         insert_blog_result = mysql.insert_blog(cursor, tennis_idx, title, url, write_date)
+        mysql.inclease_blog_count(cursor, tennis_idx)
 
 common.logger.info("END CRAWLING")
 crawl.driver.quit()
