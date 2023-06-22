@@ -12,7 +12,7 @@ class MySQL:
             connection = pymysql.connect(
                 user=config.user, password=config.password, host=config.host, database=config.database,
                 port=config.port, charset=config.charset,
-                read_timeout=2, write_timeout=2, connect_timeout=2
+                read_timeout=2, write_timeout=2, connect_timeout=2, autocommit=True
             )
             cursor = connection.cursor()
             return cursor
@@ -29,11 +29,21 @@ class MySQL:
 
         return data
 
-    def insert_blog(self, cursor, tennis_idx: int, title: string, url: string):
-        query = """INSERT INTO `tb_blog_info` (`app_key`, `blog_type`, `tennis_idx`, `blog_title`, `blog_url`, `blog_wdate`, `run_state`, `create_date`)
-                    VALUES ('ED010', 1, %s, %s, %s, now(), 1, now())"""
-        result = cursor.execute(query, (tennis_idx, title, url))
-        self.connect().connection.commit()
+    def insert_blog(self, cursor, tennis_idx: int, title: string, url: string, write_date: string):
+        query = '''INSERT INTO `tb_blog_info` (`app_key`, `blog_type`, `tennis_idx`, `blog_title`, `blog_url`, `blog_wdate`, `run_state`, `create_date`)
+                    VALUES ('ED010', 1, %s, %s, %s, %s, 1, now())'''
+        data = (tennis_idx, title, url, write_date)
+        result = cursor.execute(query, data)
+        print(query)
+        print(data)
 
-        print(result)
         return result
+
+    def exist_blog(self, cursor, url: string):
+        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s'''
+        where = (str(url))
+        cursor.execute(query, where)
+        data = cursor.fetchall()
+        if len(data) > 0:
+            return False
+        return True
