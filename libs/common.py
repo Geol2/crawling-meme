@@ -12,6 +12,6 @@ formatter = logging.Formatter('|%(asctime)s||%(name)s||%(levelname)s|\n%(message
 
 # 파일 생성
 current_time = datetime.now()
-filename = datetime.strftime(current_time, "%Y-%m-%d")
-file_handler = logging.FileHandler(os.getcwd() + "/logs/svc_" + filename + ".log", mode='a+', encoding='utf8')
+filename = datetime.strftime(current_time, "%Y%m%d")
+file_handler = logging.FileHandler(os.getcwd() + "/logs/svc-" + filename + ".log", mode='a+', encoding='utf8')
 logger.addHandler(file_handler)  # 핸들러 등록
