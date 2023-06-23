@@ -49,7 +49,7 @@ class MySQL:
             return False
         return True
 
-    def inclease_blog_count(self, cursor, tennis_idx: int):
+    def increase_blog_count(self, cursor, tennis_idx: int):
         query = '''UPDATE tb_tennis_info SET blog_cnt = blog_cnt + 1 WHERE seq= %s AND app_key = %s '''
         where = (tennis_idx, 'ED010')
         result = cursor.execute(query, where)

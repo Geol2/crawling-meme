@@ -4,11 +4,12 @@ import time
 import datetime
 
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
 from libs import config
-
+from libs import common
 
 class Crawling:
     blog_review_string = "블로그리뷰"
@@ -31,7 +32,23 @@ class Crawling:
         self.driver.implicitly_wait(self.wait_time)
         url = "https://m.place.naver.com/place/" + str(naver_id) + "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         self.driver.get(url)
+        return url
 
+    def is_valid_url(self, naver_id: int, real_url: string):
+        # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
+        # 클래스 요소를 이용해서 없거나 있거나를 판단할 수 있지만 잘못된 테니스장 주소가 뜨는 것은 막진 못하고 있습니다.
+        try:
+            title_element = self.driver.find_element(By.CLASS_NAME, "YouOG")
+            return True
+        except NoSuchElementException as e:
+            common.logger.info("(" + str(naver_id) + ") " + real_url + " 해당 url은 찾을 수 없습니다.")
+            common.logger.info(e)
+            return False
+        except Exception as e:
+            common.logger.info("(" + str(naver_id) + ") " + real_url + " 해당 url은 찾을 수 없습니다.")
+            common.logger.info("테니스 장을 찾는 도중 알 수 없는 에러가 발생했습니다. 담당자에게 테니스 url을 가지고 문의해주세요.")
+            common.logger.info(e)
+            return False
 
     def find_total(self):
         # 블로그 수 전체를 찾는 함수
