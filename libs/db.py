@@ -4,6 +4,7 @@ import pymysql
 from . import config
 from libs import common
 
+
 class MySQL:
 
     @staticmethod
@@ -57,3 +58,8 @@ class MySQL:
         print(where)
         print("++")
         return result
+
+
+mysql = MySQL()
+conn = mysql.connect().connection
+cursor = mysql.connect()

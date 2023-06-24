@@ -10,14 +10,16 @@ from selenium.webdriver.chrome.service import Service
 
 from libs import config
 from libs import common
+from libs import db
+
 
 class Crawling:
-    blog_review_string = "블로그리뷰"
-    separator = " "
-    wait_time = 1
-    data_list = []
+    init = ''
 
+
+class NaverCrawling(Crawling):
     driver = ""
+    wait_time = 1
 
     def open_url(self, naver_id: string):
         option = webdriver.ChromeOptions()
@@ -30,7 +32,8 @@ class Crawling:
         # driver = webdriver.Chrome()
         self.driver = webdriver.Chrome(option, service)
         self.driver.implicitly_wait(self.wait_time)
-        url = "https://m.place.naver.com/place/" + str(naver_id) + "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
+        url = "https://m.place.naver.com/place/" + str(
+            naver_id) + "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         self.driver.get(url)
         return url
 
@@ -50,18 +53,6 @@ class Crawling:
             common.logger.info(e)
             return False
 
-    def find_total(self):
-        # 블로그 수 전체를 찾는 함수
-        total_count = 0
-        blue_link = self.driver.find_elements(By.CLASS_NAME, "place_bluelink")
-        for e in blue_link:
-            blog_review_index = e.text.find(self.blog_review_string)
-            if blog_review_index == 0:
-                find_total_count = e.text.split(self.separator)
-                total_count = find_total_count[1]
-
-        return total_count
-
     def find_blog_url(self):
         # 블로그 링크를 찾는 부분
         url_list = []
@@ -70,12 +61,11 @@ class Crawling:
         for i in range(blog_link_count):
             a_tag = blog_link[i].find_element(By.TAG_NAME, "a")
             real_link = a_tag.get_property("href")
-            if "?" in real_link: # query string 을 만나면 추가하지 않기
+            if "?" in real_link:  # query string 을 만나면 추가하지 않기
                 real_link_parts = real_link.split("?")
                 real_link = real_link_parts[0]
             url_list.append(real_link)
         return url_list
-
 
     def click_more_blog(self, tennis_idx: int, name: string, naver_id: int):
         # 더보기 없어질 때 까지 계속하기
@@ -86,7 +76,8 @@ class Crawling:
                 print("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + " 더보기 버튼이 실행되었습니다.")
                 time.sleep(1)
             except Exception as e:
-                print("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" +  " 더보기 버튼이 없는 것 같아 블로그를 모두 보여주었다고 판단합니다.")
+                print("[" + str(tennis_idx) + "]" + name + "(" + str(
+                    naver_id) + ")" + " 더보기 버튼이 없는 것 같아 블로그를 모두 보여주었다고 판단합니다.")
                 return 1;
         print("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + " 블로그를 모두 보여주었다고 판단합니다.")
         return 0
@@ -129,3 +120,52 @@ class Crawling:
             converted_date_string = "{}-{:02d}-{:02d}".format(year, month, day)
             date_list.append(converted_date_string)
         return date_list
+
+    def tennis_blog_service(self):
+        tennis_info = db.mysql.get_tennis_info(db.cursor)
+        tennis_info_length = len(tennis_info)
+
+        for i in range(tennis_info_length):
+            try:
+                tennis_idx = int(tennis_info[i][0])
+                name = str(tennis_info[i][9])
+                naver_id = int(tennis_info[i][16])
+            except Exception as e:
+                common.logger.info("[" + str(tennis_idx) + "]" + name + " 네이버 플레이스 id가 존재하지 않습니다.")
+                continue
+
+            real_url = self.open_url(naver_id)
+            is_valid_url = self.is_valid_url(naver_id, real_url)
+            if is_valid_url is False:
+                print("[" + str(tennis_idx) + "]" + name + "(" + str(
+                    naver_id) + ")" + " 해당 테니스장 URL 주소를 찾을 수 없다는 판단을 했습니다.")
+                continue
+
+            # 리뷰 수와 실제 블로그 수가 다를 수 있어서 리뷰 수로 전체를 판단할 수 없음
+            self.click_more_blog(tennis_idx, name, naver_id)
+            all_url_list = self.find_blog_url()
+            total_count = len(all_url_list)
+            if total_count == 0:
+                print("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + " 해당 테니스장 리뷰정보가 존재하지 않습니다.")
+                continue
+
+            all_title_list = self.find_title()
+            all_date_list = self.find_write_blog_date()
+
+            if total_count != len(all_title_list):
+                print("[" + str(tennis_idx) + "]" + " 블로그 제목과 제목의 경로 개수가 다릅니다. 프로그램 수정이 필요할 수 있습니다.")
+                exit(0)
+            for j in range(total_count):
+                url = all_url_list[j]
+                title = all_title_list[j]
+                write_date = all_date_list[j]
+                is_exist_blog = db.mysql.exist_blog(db.cursor, url)
+                if not is_exist_blog:
+                    common.logger.info(
+                        "[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + url + " 등록된 리뷰 블로그가 이미 존재합니다.")
+                    continue
+                insert_blog_result = db.mysql.insert_blog(db.cursor, tennis_idx, title, url, write_date)
+                db.mysql.increase_blog_count(db.cursor, tennis_idx)
+
+        db.cursor.close()
+        db.conn.close()
