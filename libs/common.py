@@ -4,6 +4,7 @@ from pathlib import Path
 import logging
 import os
 
+from libs import config
 
 def get_project_root() -> Path:
     return Path(__file__).parent.parent
@@ -21,5 +22,10 @@ formatter = logging.Formatter('|%(asctime)s||%(name)s||%(levelname)s|\n%(message
 current_time = datetime.now()
 filename = datetime.strftime(current_time, "%Y%m%d")
 ROOT_DIR = os.path.abspath(os.curdir)
-file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
+if config.env == "localhost":
+    file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
+elif config.env == "development":
+    file_handler = logging.FileHandler("www/crawling-meme/logs/cronlog/svc-" + filename + ".log", mode='a+', encoding='utf8')
+else:
+    file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
 logger.addHandler(file_handler)  # 핸들러 등록
