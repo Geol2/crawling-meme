@@ -1,6 +1,13 @@
 from datetime import datetime
+from pathlib import Path
+
 import logging
 import os
+
+
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent
+
 
 logger = logging.getLogger(name='crawling')
 
@@ -13,5 +20,6 @@ formatter = logging.Formatter('|%(asctime)s||%(name)s||%(levelname)s|\n%(message
 # 파일 생성
 current_time = datetime.now()
 filename = datetime.strftime(current_time, "%Y%m%d")
-file_handler = logging.FileHandler(os.getcwd() + "/logs/svc-" + filename + ".log", mode='a+', encoding='utf8')
+ROOT_DIR = os.path.abspath(os.curdir)
+file_handler = logging.FileHandler( ROOT_DIR + "/logs/svc-" + filename + ".log", mode='a+', encoding='utf8')
 logger.addHandler(file_handler)  # 핸들러 등록
