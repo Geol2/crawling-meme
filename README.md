@@ -17,20 +17,20 @@ apt-get install python3-pip
 python3 -m venv .venv/{project-name} # 프로젝트별 모듈 지정
 .venv/{project-name}/bin/pip install selenium # 해당 프로젝트의 pip 모듈 설치
 
-
 source .venv/bin/activate # (.venv) 진입
 python3 -m pip install selenium
 pip install webdriver-manager
+
+# mac
+pip install selenium
+pip install --upgrade pip
 
 # 크롬 설치
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install ./google-chrome-stable_current_amd64.deb
 
-pip install selenium
-pip install --upgrade pip
-
 # windows pycharm
-# pycharm 내에서 별도 selenium 패키지 설치
+# pycharm 내에서 별도 selenium, web_driver 패키지 설치
 ```
 
 ## 크롬 드라이버 설치
