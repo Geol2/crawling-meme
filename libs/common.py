@@ -25,7 +25,7 @@ ROOT_DIR = os.path.abspath(os.curdir)
 if config.env == "localhost":
     file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
 elif config.env == "development":
-    file_handler = logging.FileHandler("www/crawling-meme/logs/cronlog/svc-" + filename + ".log", mode='a+', encoding='utf8')
+    file_handler = logging.FileHandler("/www/crawling-meme/logs/cronlog/svc-" + filename + ".log", mode='a+', encoding='utf8')
 else:
     file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
 logger.addHandler(file_handler)  # 핸들러 등록
