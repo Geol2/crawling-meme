@@ -46,3 +46,8 @@ ChromeDriver 114.0.5735.90
 ```text
 pip install pymysql
 ```
+
+## 실행방법
+```shell
+python3 main.py -blog # RDBMS에 등록된 네이버 플레이스 전체 크롤링
+```
