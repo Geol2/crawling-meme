@@ -18,7 +18,7 @@ class Crawling:
 
 
 class NaverCrawling(Crawling):
-    driver = ""
+    driver = None
     wait_time = 1
 
     def open_url(self, naver_id: string):
