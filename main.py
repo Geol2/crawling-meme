@@ -6,8 +6,6 @@ from libs import crawling
 
 
 def main(argv):
-    crawl = ''
-
     if argv[1] in ("-blog"):
         crawl = crawling.NaverCrawling()
         crawling.NaverCrawling().tennis_blog_service()

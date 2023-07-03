@@ -15,23 +15,24 @@ from libs import db
 
 class Crawling:
     init = ''
-
-
-class NaverCrawling(Crawling):
     driver = None
+
     wait_time = 1
 
-    def open_url(self, naver_id: string):
+    def __init__(self):
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_argument('--no-sandbox')
         option.add_argument('--disable-dev-shm-usage')
 
         service = Service(executable_path=config.executable_path)
-
         # driver = webdriver.Chrome()
         self.driver = webdriver.Chrome(option, service)
         self.driver.implicitly_wait(self.wait_time)
+
+
+class NaverCrawling(Crawling):
+    def open_url(self, naver_id: string):
         url = "https://m.place.naver.com/place/" + str(
             naver_id) + "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         self.driver.get(url)
@@ -125,7 +126,7 @@ class NaverCrawling(Crawling):
         tennis_info = db.mysql.get_tennis_info(db.cursor)
         tennis_info_length = len(tennis_info)
 
-        for i in range(tennis_info_length):
+        for i in range(1):
             try:
                 tennis_idx = int(tennis_info[i][0])
                 name = str(tennis_info[i][9])
