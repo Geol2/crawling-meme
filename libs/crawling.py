@@ -126,7 +126,7 @@ class NaverCrawling(Crawling):
         tennis_info = db.mysql.get_tennis_info(db.cursor)
         tennis_info_length = len(tennis_info)
 
-        for i in range(1):
+        for i in range(tennis_info_length):
             try:
                 tennis_idx = int(tennis_info[i][0])
                 name = str(tennis_info[i][9])
