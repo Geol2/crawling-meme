@@ -23,7 +23,16 @@ class MySQL:
             exit(0)
 
     def get_tennis_info(self, cursor):
-        query = "SELECT * FROM tb_tennis_info"
+        query = "SELECT * FROM tb_tennis_info WHERE run_state=1"
+        cursor.execute(query)
+        data = cursor.fetchall()
+        for row in data:
+            print(row)
+
+        return data
+
+    def get_lesson_info(self, cursor):
+        query = "SELECT * FROM tb_lesson_list WHERE run_state=1"
         cursor.execute(query)
         data = cursor.fetchall()
         for row in data:
@@ -42,7 +51,16 @@ class MySQL:
         return result
 
     def exist_blog(self, cursor, url: string):
-        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s'''
+        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=1'''
+        where = (str(url))
+        cursor.execute(query, where)
+        data = cursor.fetchall()
+        if len(data) > 0:
+            return False
+        return True
+
+    def exist_lesson_blog(self, cursor, url: string):
+        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2'''
         where = (str(url))
         cursor.execute(query, where)
         data = cursor.fetchall()

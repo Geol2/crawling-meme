@@ -12,6 +12,8 @@ from libs import config
 from libs import common
 from libs import db
 
+from dto.TennisObj import Tennis
+
 
 class Crawling:
     init = ''
@@ -32,26 +34,25 @@ class Crawling:
 
 
 class NaverCrawling(Crawling):
-    def open_url(self, naver_id: string):
-        url = "https://m.place.naver.com/place/" + str(
-            naver_id) + "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
+    def open_url(self, tennis: Tennis):
+        url = "https://m.place.naver.com/place/" + str(tennis.naver_place_id) +\
+              "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         self.driver.get(url)
+
+        is_valid_url = self.is_valid_url(tennis, url)
+        if is_valid_url is False:
+            tennis.print_logger("해당 테니스장 URL 주소를 찾을 수 없다는 판단을 했습니다.")
+            return None
         return url
 
-    def is_valid_url(self, naver_id: int, real_url: string):
+    def is_valid_url(self, tennis: Tennis, real_url: string):
         # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
         # 클래스 요소를 이용해서 없거나 있거나를 판단할 수 있지만 잘못된 테니스장 주소가 뜨는 것은 막진 못하고 있습니다.
         try:
             title_element = self.driver.find_element(By.CLASS_NAME, "YouOG")
             return True
-        except NoSuchElementException as e:
-            common.logger.info("(" + str(naver_id) + ") " + real_url + " 해당 url은 찾을 수 없습니다.")
-            common.logger.info(e)
-            return False
         except Exception as e:
-            common.logger.info("(" + str(naver_id) + ") " + real_url + " 해당 url은 찾을 수 없습니다.")
-            common.logger.info("테니스 장을 찾는 도중 알 수 없는 에러가 발생했습니다. 담당자에게 테니스 url을 가지고 문의해주세요.")
-            common.logger.info(e)
+            tennis.printLogger(e)
             return False
 
     def find_blog_url(self):
@@ -59,6 +60,7 @@ class NaverCrawling(Crawling):
         url_list = []
         blog_link = self.driver.find_elements(By.CLASS_NAME, "xg2_q")
         blog_link_count = len(blog_link)
+
         for i in range(blog_link_count):
             a_tag = blog_link[i].find_element(By.TAG_NAME, "a")
             real_link = a_tag.get_property("href")
@@ -68,19 +70,22 @@ class NaverCrawling(Crawling):
             url_list.append(real_link)
         return url_list
 
-    def click_more_blog(self, tennis_idx: int, name: string, naver_id: int):
+    def find_blog_count(self ):
+        return
+
+    def click_more_blog(self, tennis: Tennis):
         # 더보기 없어질 때 까지 계속하기
         while 1:
             try:
                 a_tag = self.driver.find_element(By.CLASS_NAME, "fvwqf")
                 a_tag.click()
-                print("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + " 더보기 버튼이 실행되었습니다.")
+                tennis.print_logger("더보기 버튼이 실행되었습니다.")
                 time.sleep(1)
             except Exception as e:
-                print("[" + str(tennis_idx) + "]" + name + "(" + str(
-                    naver_id) + ")" + " 더보기 버튼이 없는 것 같아 블로그를 모두 보여주었다고 판단합니다.")
-                return 1;
-        print("[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + " 블로그를 모두 보여주었다고 판단합니다.")
+                tennis.print_logger("더보기 버튼이 없는 것 같아 블로그를 모두 보여주었다고 판단합니다.")
+                return 1
+
+        tennis.print_logger("블로그를 모두 보여주었다고 판단합니다.")
         return 0
 
     def get_click_number(self, total_count):
@@ -125,6 +130,48 @@ class NaverCrawling(Crawling):
     def tennis_blog_service(self):
         tennis_info = db.mysql.get_tennis_info(db.cursor)
         tennis_info_length = len(tennis_info)
+        tennis = None
+
+        for i in range(tennis_info_length):
+            try:
+                tennis = Tennis(tennis_info[i][0], tennis_info[i][9], int(tennis_info[i][16]))
+                self.open_url(tennis)
+                self.click_more_blog(tennis)
+                all_url_list = self.find_blog_url()
+                self.find_blog_count(all_url_list)
+                total_count = len(all_url_list)
+                if total_count == 0:
+                    tennis.print_logger("해당 테니스장 리뷰정보가 존재하지 않습니다.")
+                    continue
+            except Exception as e:
+                tennis.file_logger("네이버 플레이스 id가 존재하지 않습니다.", e)
+                continue
+
+
+            all_title_list = self.find_title()
+            all_date_list = self.find_write_blog_date()
+
+            if total_count != len(all_title_list):
+                tennis.print_logger("블로그 제목과 제목의 경로 개수가 다릅니다. 프로그램 수정이 필요할 수 있습니다.")
+                exit(0)
+            for j in range(total_count):
+                url = all_url_list[j]
+                title = all_title_list[j]
+                write_date = all_date_list[j]
+                is_exist_blog = db.mysql.exist_blog(db.cursor, url)
+                if not is_exist_blog:
+                    common.logger.info(
+                        "[" + str(tennis.tennis_idx) + "]" + tennis.name + "(" + str(tennis.naver_id) + ")" + url + " 등록된 리뷰 블로그가 이미 존재합니다.")
+                    continue
+                insert_blog_result = db.mysql.insert_blog(db.cursor, tennis.tennis_idx, title, url, write_date)
+                db.mysql.increase_blog_count(db.cursor, tennis.tennis_idx)
+
+        db.cursor.close()
+        db.conn.close()
+
+    def tennis_blog_service_old(self):
+        tennis_info = db.mysql.get_lesson_info(db.cursor)
+        tennis_info_length = len(tennis_info)
 
         for i in range(tennis_info_length):
             try:
@@ -160,12 +207,12 @@ class NaverCrawling(Crawling):
                 url = all_url_list[j]
                 title = all_title_list[j]
                 write_date = all_date_list[j]
-                is_exist_blog = db.mysql.exist_blog(db.cursor, url)
-                if not is_exist_blog:
+                is_exist_lesson_blog = db.mysql.exist_lesson_blog(db.cursor, url)
+                if not is_exist_lesson_blog:
                     common.logger.info(
                         "[" + str(tennis_idx) + "]" + name + "(" + str(naver_id) + ")" + url + " 등록된 리뷰 블로그가 이미 존재합니다.")
                     continue
-                insert_blog_result = db.mysql.insert_blog(db.cursor, tennis_idx, title, url, write_date)
+                insert_blog_result = db.mysql.insert_lesson_blog(db.cursor, tennis_idx, title, url, write_date)
                 db.mysql.increase_blog_count(db.cursor, tennis_idx)
 
         db.cursor.close()
