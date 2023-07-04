@@ -1,4 +1,4 @@
 /.idea
-/libs/__pycache__
 /libs/db.py
 /logs
+*.py[cod]

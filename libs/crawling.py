@@ -2,6 +2,7 @@ import string
 import math
 import time
 import datetime
+from collections import defaultdict
 
 from selenium import webdriver
 from selenium.common import NoSuchElementException
@@ -11,8 +12,10 @@ from selenium.webdriver.chrome.service import Service
 from libs import config
 from libs import common
 from libs import db
+from service.tennis.blog.tennisBlog import TennisBlog
+from service.tennis.blog.tennisLesson import TennisLesson
 
-from service.tennis_service import Tennis
+from service.tennis.tennisFactory import Tennis
 
 
 class Crawling:
@@ -23,36 +26,37 @@ class Crawling:
 
     def __init__(self):
         option = webdriver.ChromeOptions()
-        option.add_argument('--headless')
-        option.add_argument('--no-sandbox')
-        option.add_argument('--disable-dev-shm-usage')
+        # option.add_argument('--headless')
+        # option.add_argument('--no-sandbox')
+        # option.add_argument('--disable-dev-shm-usage')
 
         service = Service(executable_path=config.executable_path)
         # driver = webdriver.Chrome()
         self.driver = webdriver.Chrome(option, service)
         self.driver.implicitly_wait(self.wait_time)
 
+    def browser_exit(self):
+        self.driver.quit()
+
 
 class NaverCrawling(Crawling):
+
     def open_url(self, tennis: Tennis):
-        url = "https://m.place.naver.com/place/" + str(tennis.naver_place_id) +\
+        url = "https://m.place.naver.com/place/" + str(tennis.naver_place_id) + \
               "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         self.driver.get(url)
 
-        is_valid_url = self.is_valid_url(tennis, url)
-        if is_valid_url is False:
-            tennis.print_logger("해당 테니스장 URL 주소를 찾을 수 없다는 판단을 했습니다.")
-            return None
+        self.is_valid_url(tennis, url)
         return url
 
     def is_valid_url(self, tennis: Tennis, real_url: string):
         # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
         # 클래스 요소를 이용해서 없거나 있거나를 판단할 수 있지만 잘못된 테니스장 주소가 뜨는 것은 막진 못하고 있습니다.
         try:
-            title_element = self.driver.find_element(By.CLASS_NAME, "YouOG")
+            self.driver.find_element(By.CLASS_NAME, "YouOG")
             return True
         except Exception as e:
-            tennis.printLogger(e)
+            tennis.file_logger("네이버 플레이스 URL 주소가 존재하지 않습니다.")
             return False
 
     def find_blog_url(self):
@@ -70,26 +74,32 @@ class NaverCrawling(Crawling):
             url_list.append(real_link)
         return url_list
 
-    def find_blog_count(self, tennis: Tennis):
-        tennis.tennis_map = (tennis.tennis_idx)
-
-
-        return
+    def click_more_end_blog(self, tennis: Tennis):
+        # 더보기 없어질 때 까지 계속하기
+        is_all_click = False
+        while 1:
+            if is_all_click is False:
+                is_all_click = self.click_more(tennis)
+            else:
+                return is_all_click
 
     def click_more_blog(self, tennis: Tennis):
-        # 더보기 없어질 때 까지 계속하기
-        while 1:
-            try:
-                a_tag = self.driver.find_element(By.CLASS_NAME, "fvwqf")
-                a_tag.click()
-                tennis.print_logger("더보기 버튼이 실행되었습니다.")
-                time.sleep(1)
-            except RuntimeError as e:
-                tennis.print_logger("click_more_blog 에서 알 수 없는 오류가 발생하였습니다.")
-                return -1
-            finally:
-                tennis.print_logger("블로그를 모두 보여주었다고 판단합니다.")
-                return 0
+        # 더보기 한번만 하기
+        self.click_more(tennis)
+
+    def click_more(self, tennis: Tennis):
+        try:
+            a_tag = self.driver.find_element(By.CLASS_NAME, "fvwqf")
+            a_tag.click()
+            tennis.file_logger("더보기 버튼이 실행되었습니다.")
+            time.sleep(1)
+            return False
+        except NoSuchElementException as e:
+            tennis.file_logger("블로그를 모두 보여주었다고 판단합니다.")
+            return True
+        except RuntimeError as e:
+            tennis.file_logger("crawling.click_more_blog() 에서 알 수 없는 오류가 발생하였습니다.")
+            return False
 
     def get_click_number(self, total_count):
         # 더보기 클릭을 몇 번 해야하는지 찾는 함수
@@ -128,27 +138,63 @@ class NaverCrawling(Crawling):
             date_list.append(converted_date_string)
         return date_list
 
+    def compare_display_blog(self, tennis: Tennis):
+        # 화면상 전체 개수와 데이터베이스 개수가 같은지 다른지 비교하기
+        url_list = self.find_blog_url()
+        blog_info = db.mysql.get_blog_info(tennis)
+        if len(url_list) == blog_info:
+            return True
+        return False
+        # 하다말기
+
     def tennis_blog_service(self):
-        tennis_info = db.mysql.get_tennis_info(db.cursor)
+        rows = db.mysql.get_tennis_info(db.cursor)
         tennis = None
 
-        for i in range(len(tennis_info)):
-            try:
-                tennis = Tennis(tennis_info[i][0], tennis_info[i][9], tennis_info[i][16])
-                self.open_url(tennis)
-                self.click_more_blog(tennis)
+        for row in rows:
+            tennis = TennisBlog(row["seq"], row["tennis_name"], row["tennis_naver_id"])
+            tennis.file_logger(str(tennis.tennis_idx))
 
-                all_url_list = self.find_blog_url()
-                all_title_list = self.find_title()
-                all_date_list = self.find_write_blog_date()
-                tennis.set_array(all_url_list, all_title_list, all_date_list)
-                tennis.exist_blog()
+            try:
+                self.open_url(tennis)
+                self.click_more_end_blog(tennis)
+                is_blog_equals = self.compare_display_blog(tennis)
+                if is_blog_equals is True:
+                    tennis.file_logger("  확인할 필요 없는 판단을 합니다.")
+                    continue
+
+                for _ in range(tennis.total_count):
+                    # self.open_url(tennis)
+                    tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
+                    tennis.exist_blog()
+                    self.click_more_blog(tennis)
+                    # tennis.set_end_flag()
             except Exception as e:
-                tennis.print_logger(e)
+                tennis.file_logger(e)
 
         db.cursor.close()
         db.conn.close()
 
+    def tennis_lesson_service(self):
+        rows = db.mysql.get_lesson_info(db.cursor)
+        tennis = None
+
+        for row in rows:
+            tennis = TennisLesson(row["seq"], row["tennis_name"], row["tennis_naver_id"])
+            tennis.print_logger(str(tennis.tennis_idx))
+
+            try:
+                self.open_url(tennis)
+                self.click_more_blog(tennis)
+                tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
+                tennis.exist_lesson_blog()
+            except Exception as e:
+                tennis.file_logger(e)
+
+        db.cursor.close()
+        db.conn.close()
+
+    # 참고만 합니다
     def tennis_blog_service_old(self):
         tennis_info = db.mysql.get_lesson_info(db.cursor)
         tennis_info_length = len(tennis_info)

@@ -2,7 +2,7 @@ import string
 
 import pymysql
 
-from service.tennis_service import Tennis
+from service.tennis.tennisFactory import Tennis
 from . import config
 from libs import common
 
@@ -15,7 +15,8 @@ class MySQL:
             connection = pymysql.connect(
                 user=config.user, password=config.password, host=config.host, database=config.database,
                 port=config.port, charset=config.charset,
-                read_timeout=2, write_timeout=2, connect_timeout=2, autocommit=True
+                read_timeout=2, write_timeout=2, connect_timeout=2, autocommit=True,
+                cursorclass=pymysql.cursors.DictCursor
             )
             cursor = connection.cursor()
             return cursor
@@ -44,11 +45,11 @@ class MySQL:
 
     def insert_blog(self, cursor, tennis_idx: int, data_dict: dict):
         query = '''INSERT INTO `tb_blog_info` (`app_key`, `blog_type`, `tennis_idx`, `blog_title`, `blog_url`, `blog_wdate`, `run_state`, `create_date`)
-                    VALUES ('ED010', 1, %s, %s, %s, %s, 1, now())'''
-        data = (tennis_idx, data_dict.get("title"), data_dict.get("url"), data_dict.get("w_date"))
+                    VALUES ('ED010', %s, %s, %s, %s, %s, 1, now())'''
+        data = (data_dict.get("blog_type"), tennis_idx, data_dict.get("title"), data_dict.get("url"), data_dict.get("w_date"))
         result = cursor.execute(query, data)
         print(query)
-        print(data)
+
 
         return result
 
@@ -61,22 +62,40 @@ class MySQL:
             return True
         return False
 
-    def exist_lesson_blog(self, cursor, url: string):
+    def is_exist_lesson(self, cursor, url: string):
         query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2'''
         where = (str(url))
         cursor.execute(query, where)
         data = cursor.fetchall()
         if len(data) > 0:
-            return False
-        return True
+            return True
+        return False
 
     def increase_blog_count(self, cursor, tennis_idx: int):
-        query = '''UPDATE tb_tennis_info SET blog_cnt = blog_cnt + 1 WHERE seq= %s AND app_key = %s '''
-        where = (tennis_idx, 'ED010')
+        query = '''UPDATE tb_tennis_info SET blog_cnt = blog_cnt + 1 WHERE seq= %s '''
+        where = tennis_idx
         result = cursor.execute(query, where)
         print(query)
-        print(where)
-        print("++")
+        return result
+
+    def increase_lesson_count(self, cursor, tennis_idx: int):
+        query = '''UPDATE tb_lesson_list SET blog_cnt = blog_cnt + 1 WHERE seq= %s '''
+        where = tennis_idx
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
+    def set_blog_end_flag(self):
+        query = '''UPDATE tb_blog_info SET end_flag = 1 '''
+        result = cursor.execute(query)
+        print(query)
+        return result
+
+    def get_blog_info(self, tennis: Tennis):
+        query = '''SELECT * FROM tb_blog_info WHERE tennis_idx = %s AND blog_type = 1 AND run_state = 1 '''
+        where = tennis.tennis_idx
+        result = cursor.execute(query, where)
+        print(query)
         return result
 
 
