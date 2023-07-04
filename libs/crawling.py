@@ -12,7 +12,7 @@ from libs import config
 from libs import common
 from libs import db
 
-from dto.TennisObj import Tennis
+from service.tennis_service import Tennis
 
 
 class Crawling:
@@ -70,7 +70,10 @@ class NaverCrawling(Crawling):
             url_list.append(real_link)
         return url_list
 
-    def find_blog_count(self ):
+    def find_blog_count(self, tennis: Tennis):
+        tennis.tennis_map = (tennis.tennis_idx)
+
+
         return
 
     def click_more_blog(self, tennis: Tennis):
@@ -81,12 +84,12 @@ class NaverCrawling(Crawling):
                 a_tag.click()
                 tennis.print_logger("더보기 버튼이 실행되었습니다.")
                 time.sleep(1)
-            except Exception as e:
-                tennis.print_logger("더보기 버튼이 없는 것 같아 블로그를 모두 보여주었다고 판단합니다.")
-                return 1
-
-        tennis.print_logger("블로그를 모두 보여주었다고 판단합니다.")
-        return 0
+            except RuntimeError as e:
+                tennis.print_logger("click_more_blog 에서 알 수 없는 오류가 발생하였습니다.")
+                return -1
+            finally:
+                tennis.print_logger("블로그를 모두 보여주었다고 판단합니다.")
+                return 0
 
     def get_click_number(self, total_count):
         # 더보기 클릭을 몇 번 해야하는지 찾는 함수
@@ -105,8 +108,6 @@ class NaverCrawling(Crawling):
     def find_write_blog_date(self):
         date_list = []
         date_element = self.driver.find_elements(By.CLASS_NAME, "FYQ74")
-        input_format = "%y.%m.%d.%a"
-        output_format = "%Y-%m-%d"
         for i in range(len(date_element)):
             write_date_element = date_element[i].find_element(By.TAG_NAME, "span")
             write_date_text = write_date_element.text
@@ -129,42 +130,21 @@ class NaverCrawling(Crawling):
 
     def tennis_blog_service(self):
         tennis_info = db.mysql.get_tennis_info(db.cursor)
-        tennis_info_length = len(tennis_info)
         tennis = None
 
-        for i in range(tennis_info_length):
+        for i in range(len(tennis_info)):
             try:
-                tennis = Tennis(tennis_info[i][0], tennis_info[i][9], int(tennis_info[i][16]))
+                tennis = Tennis(tennis_info[i][0], tennis_info[i][9], tennis_info[i][16])
                 self.open_url(tennis)
                 self.click_more_blog(tennis)
+
                 all_url_list = self.find_blog_url()
-                self.find_blog_count(all_url_list)
-                total_count = len(all_url_list)
-                if total_count == 0:
-                    tennis.print_logger("해당 테니스장 리뷰정보가 존재하지 않습니다.")
-                    continue
+                all_title_list = self.find_title()
+                all_date_list = self.find_write_blog_date()
+                tennis.set_array(all_url_list, all_title_list, all_date_list)
+                tennis.exist_blog()
             except Exception as e:
-                tennis.file_logger("네이버 플레이스 id가 존재하지 않습니다.", e)
-                continue
-
-
-            all_title_list = self.find_title()
-            all_date_list = self.find_write_blog_date()
-
-            if total_count != len(all_title_list):
-                tennis.print_logger("블로그 제목과 제목의 경로 개수가 다릅니다. 프로그램 수정이 필요할 수 있습니다.")
-                exit(0)
-            for j in range(total_count):
-                url = all_url_list[j]
-                title = all_title_list[j]
-                write_date = all_date_list[j]
-                is_exist_blog = db.mysql.exist_blog(db.cursor, url)
-                if not is_exist_blog:
-                    common.logger.info(
-                        "[" + str(tennis.tennis_idx) + "]" + tennis.name + "(" + str(tennis.naver_id) + ")" + url + " 등록된 리뷰 블로그가 이미 존재합니다.")
-                    continue
-                insert_blog_result = db.mysql.insert_blog(db.cursor, tennis.tennis_idx, title, url, write_date)
-                db.mysql.increase_blog_count(db.cursor, tennis.tennis_idx)
+                tennis.print_logger(e)
 
         db.cursor.close()
         db.conn.close()
