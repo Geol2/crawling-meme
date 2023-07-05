@@ -2,7 +2,6 @@ import string
 import math
 import time
 import datetime
-from collections import defaultdict
 
 from selenium import webdriver
 from selenium.common import NoSuchElementException
@@ -141,11 +140,18 @@ class NaverCrawling(Crawling):
     def compare_display_blog(self, tennis: Tennis):
         # 화면상 전체 개수와 데이터베이스 개수가 같은지 다른지 비교하기
         url_list = self.find_blog_url()
-        blog_info = db.mysql.get_blog_info(tennis)
+        blog_info = db.mysql.get_blog_info(tennis, 1)
         if len(url_list) == blog_info:
             return True
         return False
         # 하다말기
+
+    def compare_display_lesson(self, tennis: Tennis):
+        url_list = self.find_blog_url()
+        lesson_info = db.mysql.get_blog_info(tennis, 2)
+        if len(url_list) == lesson_info:
+            return True
+        return False
 
     def tennis_blog_service(self):
         rows = db.mysql.get_tennis_info(db.cursor)
@@ -160,15 +166,11 @@ class NaverCrawling(Crawling):
                 self.click_more_end_blog(tennis)
                 is_blog_equals = self.compare_display_blog(tennis)
                 if is_blog_equals is True:
-                    tennis.file_logger("  확인할 필요 없는 판단을 합니다.")
+                    tennis.file_logger(" 확인할 필요 없는 판단을 합니다.")
                     continue
+                tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
+                tennis.exist_blog()
 
-                for _ in range(tennis.total_count):
-                    # self.open_url(tennis)
-                    tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
-                    tennis.exist_blog()
-                    self.click_more_blog(tennis)
-                    # tennis.set_end_flag()
             except Exception as e:
                 tennis.file_logger(e)
 
@@ -185,7 +187,11 @@ class NaverCrawling(Crawling):
 
             try:
                 self.open_url(tennis)
-                self.click_more_blog(tennis)
+                self.click_more_end_blog(tennis)
+                is_blog_equals = self.compare_display_lesson(tennis)
+                if is_blog_equals is True:
+                    tennis.file_logger(" 확인할 필요 없는 판단을 합니다.")
+                    continue
                 tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
                 tennis.exist_lesson_blog()
             except Exception as e:

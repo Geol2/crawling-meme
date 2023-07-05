@@ -26,21 +26,15 @@ class MySQL:
             exit(0)
 
     def get_tennis_info(self, cursor):
-        query = "SELECT * FROM tb_tennis_info WHERE run_state=1"
+        query = "SELECT * FROM tb_tennis_info WHERE run_state = 1"
         cursor.execute(query)
         data = cursor.fetchall()
-        for row in data:
-            print(row)
-
         return data
 
     def get_lesson_info(self, cursor):
-        query = "SELECT * FROM tb_lesson_list WHERE run_state=1"
+        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1"
         cursor.execute(query)
         data = cursor.fetchall()
-        for row in data:
-            print(row)
-
         return data
 
     def insert_blog(self, cursor, tennis_idx: int, data_dict: dict):
@@ -91,9 +85,9 @@ class MySQL:
         print(query)
         return result
 
-    def get_blog_info(self, tennis: Tennis):
-        query = '''SELECT * FROM tb_blog_info WHERE tennis_idx = %s AND blog_type = 1 AND run_state = 1 '''
-        where = tennis.tennis_idx
+    def get_blog_info(self, tennis: Tennis, blog_type: int):
+        query = '''SELECT * FROM tb_blog_info WHERE tennis_idx = %s AND blog_type = %s '''
+        where = (tennis.tennis_idx, blog_type)
         result = cursor.execute(query, where)
         print(query)
         return result

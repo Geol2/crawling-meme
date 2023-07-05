@@ -11,7 +11,7 @@ def main(argv):
         crawling.Crawling().browser_exit()
     elif argv[1] in ("-lesson"):
         crawling.NaverCrawling().tennis_lesson_service()
-        crawling.NaverCrawling.browser_exit()
+        crawling.Crawling().browser_exit()
     elif argv[1] in ("-url"):
         # 특정 url을 가져와서 크롤링하기
         return 0
