@@ -40,10 +40,10 @@ class Tennis:
             self.tennis_dict["title"].append(title[i])
             self.tennis_dict["w_date"].append(date[i])
 
-    def insert_tennis_blog(self, seq: int, blog_type: int):
-        url = self.tennis_dict['url'][seq]
-        title = self.tennis_dict['title'][seq]
-        w_date = self.tennis_dict['w_date'][seq]
+    def insert_tennis_blog(self, data: [], i: int, blog_type: int):
+        url = data['url'][i]
+        title = data['title'][i]
+        w_date = data['w_date'][i]
 
         data = {
             "url": url,
@@ -58,6 +58,18 @@ class Tennis:
 
     def set_blog_end_flag(self):
         db.mysql.set_blog_end_flag(db.cursor, self.tennis_idx)
+
+    def set_blog_info(self, blog_url: []):
+        blog_url_length = len(blog_url)
+        for i in range(blog_url_length):
+            db.mysql.set_blog_info(db.cursor, blog_url[i])
+
+    def exist_blog(self):
+        db.mysql.set_lesson_info()
+        return
+
+    def unset_tennis_info(self):
+        return db.mysql.unset_tennis()
 
     def file_logger(self, message: string, e=None):
         if self.tennis_idx == -1:

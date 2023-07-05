@@ -9,11 +9,13 @@ class NTennis:
 
     naver_place_id = 0
 
-    data_dict = {
+    tennis_dict = {
         "url": [],
         "title": [],
         "w_date": []
     }
+
+    blog_count = 0
 
     def __init__(self, naver_place_id: int):
         self.naver_place_id = naver_place_id
@@ -25,15 +27,18 @@ class NTennis:
         driver.get(url)
         return url
 
-    def read_next(self, driver, paging: int = 0):
+    def read_next(self, driver):
         # 더보기 실행
-        a_tag = driver.find_element(By.CLASS_NAME, "fvwqf")
-        a_tag.click()
-        time.sleep(2)
+        try:
+            a = driver.find_element(By.CLASS_NAME, "fvwqf") # 더보기를 찾았을까?
+            a.click()
+            time.sleep(2)
+        except Exception as e:
+            common.file_logger(" 더보기를 실행할 수 없습니다.")
+            return
+        return
 
-    def set_list_new(self, url: [], title: [], date: [], pagind: int):
-        #if len(url) == 0:
-        #    raise Exception("테니스장 정보가 존재할 수 없습니다.")
+    def set_list_new(self, url: [], title: [], date: [], paging: int):
         if len(url) != len(title) or len(url) != len(date) or len(title) != len(date):
             raise Exception("테니스 정보를 합칠 수 없습니다.")
         if len(self.tennis_dict["url"]) > 0:
@@ -41,15 +46,17 @@ class NTennis:
             self.tennis_dict["title"] = []
             self.tennis_dict["w_date"] = []
 
-        index = pagind * 10 - 10
+        index = paging * 10 - 10
         for i in range(len(url)):
             if index == len(url):
                 break
-            self.total_count = len(url)
             self.tennis_dict["url"].append(url[index])
             self.tennis_dict["title"].append(title[index])
             self.tennis_dict["w_date"].append(date[index])
             index += 1
+            self.blog_count += 1
+
+        return self.tennis_dict
 
     def set_list(self, url: [], title: [], date: []):
         #if len(url) == 0:
@@ -73,11 +80,9 @@ class NTennis:
 
     def is_eof(self, driver):
         # 끝임을 판단할 함수
-        click_count = 0
         try:
-            a_tag = driver.find_element(By.CLASS_NAME, "fvwqf")
-            a_tag.click()
-            click_count += 1
+            # 더보기를 찾았을까?
+            driver.find_element(By.CLASS_NAME, "fvwqf")
             time.sleep(2)
             return False
         except NoSuchElementException as e:

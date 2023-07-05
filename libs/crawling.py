@@ -27,9 +27,9 @@ class Crawling:
 
     def __init__(self):
         option = webdriver.ChromeOptions()
-        option.add_argument('--headless')
-        option.add_argument('--no-sandbox')
-        option.add_argument('--disable-dev-shm-usage')
+        #option.add_argument('--headless')
+        #option.add_argument('--no-sandbox')
+        #option.add_argument('--disable-dev-shm-usage')
 
         service = Service(executable_path=config.executable_path)
         # driver = webdriver.Chrome()
@@ -182,22 +182,45 @@ class NaverCrawling(Crawling):
         db.cursor.close()
         db.conn.close()
 
+
     def tennis_lesson_service(self):
         rows = db.mysql.get_lesson_info(db.cursor)
-        rows_length = len(rows)
         tennis = None
+        rows_length = len(rows)
 
         for i in range(0, rows_length, 1):
             tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
-            tennis.print_logger(str(tennis.tennis_idx))
+            lesson_seq = rows[i]["seq"]
+            tennis.file_logger(str(tennis.tennis_idx))
 
             try:
-                self.open_url(tennis)
-                self.click_more_end_blog(tennis)
-                tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
-                tennis.exist_lesson_blog()
+                naver_tennis = NTennis(tennis.naver_place_id)
+                is_continue = db.mysql.search_lesson_list(tennis.tennis_idx)
+                if is_continue is False:
+                    common.file_logger("해당 레슨 테니스장 정보는 넘어갑니다.")
+                    continue
+                naver_tennis.open(self.driver)
+                paging = 1
+
+                while True:
+                    # 블로그 판별
+                    data = naver_tennis.set_list_new(self.find_blog_url(), self.find_title(), self.find_write_blog_date(), paging)
+
+                    paging += 1
+                    tennis.exist_lesson_blog(data)
+                    tennis.set_blog_info(naver_tennis.tennis_dict["url"])
+                    is_eof = naver_tennis.is_eof(self.driver)
+                    if is_eof is True:
+                        db.mysql.set_lesson_info(tennis.tennis_idx)
+                        db.mysql.set_lesson_list(tennis.tennis_idx)
+                        break
+                    else:
+                        naver_tennis.read_next(self.driver)
             except Exception as e:
-                tennis.file_logger("알 수 없는 오류 발생")
+                db.mysql.unset_lesson_info(lesson_seq)
+                db.mysql.unset_lesson_list(lesson_seq)
+                common.file_logger("tennis_blog_service_new() 에서 알 수 없는 에러가 발생하였습니다.")
+
 
 
 
@@ -239,23 +262,21 @@ class NaverCrawling(Crawling):
                 tennis.update_tennis_info()
 
     def tennis_blog_service_old(self):
-        rows = db.mysql.get_tennis_info(db.cursor)
+        rows = db.mysql.get_lesson_info(db.cursor)
+        rows_length = len(rows)
         tennis = None
 
-        for row in rows:
-            tennis = TennisBlog(row["seq"], row["tennis_name"], row["tennis_naver_id"])
-            tennis.file_logger(str(tennis.tennis_idx))
+        for i in range(0, rows_length, 1):
+            tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
+            tennis.print_logger(str(tennis.tennis_idx))
 
             try:
                 self.open_url(tennis)
                 self.click_more_end_blog(tennis)
                 tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
-                tennis.exist_blog()
+                tennis.exist_lesson_blog()
             except Exception as e:
-                tennis.file_logger(e)
-
-        db.cursor.close()
-        db.conn.close()
+                tennis.file_logger("알 수 없는 오류 발생")
 
     def tennis_blog_service_older(self):
         tennis_info = db.mysql.get_lesson_info(db.cursor)

@@ -57,7 +57,7 @@ class MySQL:
         return False
 
     def is_exist_lesson(self, cursor, url: string):
-        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2'''
+        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2 AND is_checkout = 0 '''
         where = (str(url))
         cursor.execute(query, where)
         data = cursor.fetchall()
@@ -92,13 +92,65 @@ class MySQL:
         print(query)
         return result
 
-    def update_checkout_blog(self, blog_url: string):
-        query = '''UPDATE tb_blog_info SET checkout = 1 WHERE blog_url = %s '''
+    def set_blog_info(self, cursor, blog_url: string):
+        query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE blog_url = %s '''
         where = blog_url
         result = cursor.execute(query, where)
         print(query)
         return result
 
+    def set_lesson_info(self, seq: int):
+        query = '''UPDATE tb_tennis_info SET is_checkout = 1 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
+    def set_lesson_list(self, seq: int):
+        query = '''UPDATE tb_lesson_list set is_checkout = 1 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
+    def unset_lesson_list(self, seq: int):
+        query = '''UPDATE tb_lesson_list SET is_checkout = 0 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        if len(result) > 0:
+            return True
+        return False
+
+    def unset_lesson_info(self, seq, int):
+        query = '''UPDATE tb_blog_info SET is_checkout = 0 WHERE tennis_idx = %s WHERE blog_type = 2'''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        if len(result) > 0:
+            return True
+        return False
+
+    def unset_tennis_info(self, seq: int):
+        query = '''UPDATE tb_tennis_info SET is_checkout = 0 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, seq)
+        print(query)
+        if len(result) > 0:
+            return True
+        return False
+
+    def search_lesson_list(self, seq: int):
+        query = '''SELECT is_checkout FROM tb_lesson_list WHERE seq = %s AND (is_checkout = 0 or is_checkout IS NULL) '''
+        where = seq
+        result = cursor.execute(query, seq)
+        print(query)
+        if result > 0:
+            # 계속 진행
+            return True
+
+        # 진행하지 않음
+        return False
 
 mysql = MySQL()
 conn = mysql.connect().connection
