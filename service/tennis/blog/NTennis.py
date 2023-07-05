@@ -51,7 +51,7 @@ class NTennis:
             self.tennis_dict["w_date"].append(date[index])
             index += 1
 
-    def set_list(self, url: [], title: [], date: [], pagind: int):
+    def set_list(self, url: [], title: [], date: []):
         #if len(url) == 0:
         #    raise Exception("테니스장 정보가 존재할 수 없습니다.")
         if len(url) != len(title) or len(url) != len(date) or len(title) != len(date):
@@ -61,15 +61,11 @@ class NTennis:
             self.tennis_dict["title"] = []
             self.tennis_dict["w_date"] = []
 
-        index = pagind * 10 - 10
         for i in range(len(url)):
-            if index == len(url):
-                break
             self.total_count = len(url)
-            self.tennis_dict["url"].append(url[index])
-            self.tennis_dict["title"].append(title[index])
-            self.tennis_dict["w_date"].append(date[index])
-            index += 1
+            self.tennis_dict["url"].append(url[i])
+            self.tennis_dict["title"].append(title[i])
+            self.tennis_dict["w_date"].append(date[i])i
 
     def get_dict_list(self):
         # 데이터 가져오기
