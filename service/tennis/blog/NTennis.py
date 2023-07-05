@@ -65,7 +65,7 @@ class NTennis:
             self.total_count = len(url)
             self.tennis_dict["url"].append(url[i])
             self.tennis_dict["title"].append(title[i])
-            self.tennis_dict["w_date"].append(date[i])i
+            self.tennis_dict["w_date"].append(date[i])
 
     def get_dict_list(self):
         # 데이터 가져오기
