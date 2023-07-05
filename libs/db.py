@@ -92,6 +92,13 @@ class MySQL:
         print(query)
         return result
 
+    def update_checkout_blog(self, blog_url: string):
+        query = '''UPDATE tb_blog_info SET checkout = 1 WHERE blog_url = %s '''
+        where = blog_url
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
 
 mysql = MySQL()
 conn = mysql.connect().connection

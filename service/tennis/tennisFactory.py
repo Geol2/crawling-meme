@@ -53,9 +53,6 @@ class Tennis:
         }
         db.mysql.insert_blog(db.cursor, self.tennis_idx, data)
 
-    def increase_blog_count(self):
-        db.mysql.increase_blog_count(db.cursor, self.tennis_idx)
-
     def increase_lesson_count(self):
         db.mysql.increase_lesson_count(db.cursor, self.tennis_idx)
 

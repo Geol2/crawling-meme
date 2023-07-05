@@ -187,7 +187,7 @@ class NaverCrawling(Crawling):
         rows_length = len(rows)
         tennis = None
 
-        for i in range(180, rows_length - 1, 1):
+        for i in range(0, rows_length, 1):
             tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
             tennis.print_logger(str(tennis.tennis_idx))
 
@@ -229,13 +229,14 @@ class NaverCrawling(Crawling):
                                                                    self.find_write_blog_date(), paging)
                     is_eof = naver_tennis.is_eof(self.driver)
                     if is_eof is True:
-                        checkout = True
-                        tennis.exist_blog(checkout)
+                        tennis.exist_blog()
                         break
                     else:
                         naver_tennis.read_next(self.driver, paging)
             except Exception as e:
-                tennis.file_logger("tennis_blog_service_new()에서 알 수 없는 에러가 발생하였습니다.")
+                common.file_logger("tennis_blog_service_new() 에서 알 수 없는 에러가 발생하였습니다.")
+            finally:
+                tennis.update_tennis_info()
 
     def tennis_blog_service_old(self):
         rows = db.mysql.get_tennis_info(db.cursor)
