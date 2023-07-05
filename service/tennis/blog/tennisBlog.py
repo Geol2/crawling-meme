@@ -4,7 +4,7 @@ from service.tennis import tennisFactory
 
 class TennisBlog(tennisFactory.Tennis):
 
-    def exist_blog(self):
+    def exist_blog(self, checkout):
         for seq in range(self.total_count):
             url = self.tennis_dict['url'][seq]
             is_exist_blog = db.mysql.is_exist_blog(db.cursor, url)

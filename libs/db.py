@@ -32,7 +32,7 @@ class MySQL:
         return data
 
     def get_lesson_info(self, cursor):
-        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1"
+        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1 ORDER BY seq ASC"
         cursor.execute(query)
         data = cursor.fetchall()
         return data

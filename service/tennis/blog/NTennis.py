@@ -2,7 +2,7 @@ import time
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from libs import common
+from libs import common, db
 
 
 class NTennis:

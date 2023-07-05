@@ -184,10 +184,11 @@ class NaverCrawling(Crawling):
 
     def tennis_lesson_service(self):
         rows = db.mysql.get_lesson_info(db.cursor)
+        rows_length = len(rows)
         tennis = None
 
-        for row in rows:
-            tennis = TennisLesson(row["seq"], row["tennis_name"], row["tennis_naver_id"])
+        for i in range(180, rows_length - 1, 1):
+            tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
             tennis.print_logger(str(tennis.tennis_idx))
 
             try:
@@ -196,7 +197,7 @@ class NaverCrawling(Crawling):
                 tennis.set_array(self.find_blog_url(), self.find_title(), self.find_write_blog_date())
                 tennis.exist_lesson_blog()
             except Exception as e:
-                tennis.file_logger(e)
+                tennis.file_logger("알 수 없는 오류 발생")
 
 
 
@@ -226,8 +227,10 @@ class NaverCrawling(Crawling):
                     tennis.tennis_dict = naver_tennis.set_list_new(self.find_blog_url(),
                                                                    self.find_title(),
                                                                    self.find_write_blog_date(), paging)
-                    tennis.exist_blog()
-                    if naver_tennis.is_eof(self.driver) is True:
+                    is_eof = naver_tennis.is_eof(self.driver)
+                    if is_eof is True:
+                        checkout = True
+                        tennis.exist_blog(checkout)
                         break
                     else:
                         naver_tennis.read_next(self.driver, paging)
