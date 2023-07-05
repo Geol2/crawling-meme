@@ -43,7 +43,7 @@ class MySQL:
         data = (data_dict.get("blog_type"), tennis_idx, data_dict.get("title"), data_dict.get("url"), data_dict.get("w_date"))
         result = cursor.execute(query, data)
         print(query)
-
+        common.file_logger(query)
 
         return result
 

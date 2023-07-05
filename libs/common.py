@@ -1,3 +1,5 @@
+import string
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -31,3 +33,17 @@ else:
     file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
 
 logger.addHandler(file_handler)  # 핸들러 등록
+
+
+def file_logger(self, message: string):
+    if self.tennis_idx == -1:
+        logger.info("테니스장 idx 정보가 잘못되었습니다.")
+        return
+
+    if self.name is None:
+        logger.info("테니스장 이름이 존재하지 않습니다.")
+    if self.naver_place_id == -1:
+        logger.info("네이버 플레이스 id가 존재하지 않습니다.")
+
+    logger.info(time.strftime('[%Y.%m.%d][%H:%M:%S]') + "[" + str(self.tennis_idx) + "] " + str(self.name) + "(" +
+                str(self.naver_place_id) + ")" + message)
