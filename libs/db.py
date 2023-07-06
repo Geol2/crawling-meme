@@ -32,18 +32,18 @@ class MySQL:
         return data
 
     def get_lesson_info(self, cursor):
-        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1"
+        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1 ORDER BY seq ASC"
         cursor.execute(query)
         data = cursor.fetchall()
         return data
 
     def insert_blog(self, cursor, tennis_idx: int, data_dict: dict):
-        query = '''INSERT INTO `tb_blog_info` (`app_key`, `blog_type`, `tennis_idx`, `blog_title`, `blog_url`, `blog_wdate`, `run_state`, `create_date`)
-                    VALUES ('ED010', %s, %s, %s, %s, %s, 1, now())'''
+        query = '''INSERT INTO `tb_blog_info` (`app_key`, `blog_type`, `tennis_idx`, `blog_title`, `blog_url`, `blog_wdate`, `run_state`, `create_date`, `is_checkout`)
+                    VALUES ('ED010', %s, %s, %s, %s, %s, 1, now(), 1)'''
         data = (data_dict.get("blog_type"), tennis_idx, data_dict.get("title"), data_dict.get("url"), data_dict.get("w_date"))
         result = cursor.execute(query, data)
         print(query)
-
+        common.file_logger(query)
 
         return result
 
@@ -56,9 +56,18 @@ class MySQL:
             return True
         return False
 
-    def is_exist_lesson(self, cursor, url: string):
-        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2'''
-        where = (str(url))
+    def is_exist_lesson(self, url: string):
+        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2 '''
+        where = url
+        cursor.execute(query, where)
+        data = cursor.fetchall()
+        if len(data) > 0:
+            return True
+        return False
+
+    def is_crawling_lesson(self, url: string):
+        query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2 '''
+        where = url
         cursor.execute(query, where)
         data = cursor.fetchall()
         if len(data) > 0:
@@ -91,6 +100,106 @@ class MySQL:
         result = cursor.execute(query, where)
         print(query)
         return result
+
+    def set_blog_info(self, blog_url: string):
+        query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE blog_url = %s AND blog_type = 1 '''
+        where = blog_url
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
+    def set_lesson_info(self, seq: int):
+        query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE tennis_idx = %s '''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
+    def set_lesson_info_by_url(self, url: string):
+        query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE blog_url = %s AND blog_type = 2 '''
+        where = url
+        result = cursor.execute(query, where)
+        print(query)
+        common.file_logger(query)
+
+        return result
+
+    def set_lesson_list(self, seq: int):
+        query = '''UPDATE tb_lesson_list set is_checkout = 1 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        return result
+
+    def unset_lesson_list(self, seq: int):
+        query = '''UPDATE tb_lesson_list SET is_checkout = 0 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        if result > 0:
+            return True
+        return False
+
+    def unset_lesson_info(self, seq: int):
+        query = '''UPDATE tb_blog_info SET is_checkout = 0 WHERE tennis_idx = %s AND blog_type = 2'''
+        where = seq
+        result = cursor.execute(query, where)
+        print(query)
+        if result > 0:
+            return True
+        return False
+
+    def unset_lesson_info_by_tennis_idx(self, tennis_idx: int):
+        query = '''UPDATE tb_blog_info SET is_checkout = 0 WHERE tennis_idx = %s AND blog_type = 2'''
+        where = tennis_idx
+        result = cursor.execute(query, where)
+        print(query)
+        if result > 0:
+            return True
+        return False
+
+    def unset_lesson_list_by_idx(self, idx: int):
+        query = '''UPDATE tb_lesson_list SET is_checkout = 0 WHERE idx = %s '''
+        where = idx
+        result = cursor.execute(query, where)
+        print(query)
+        if result > 0:
+            return True
+        return False
+
+    def unset_tennis_info(self, seq: int):
+        query = '''UPDATE tb_tennis_info SET is_checkout = 0 WHERE seq = %s '''
+        where = seq
+        result = cursor.execute(query, seq)
+        print(query)
+        if len(result) > 0:
+            return True
+        return False
+
+    def search_lesson_list(self, seq: int):
+        query = '''SELECT is_checkout FROM tb_lesson_list WHERE seq = %s AND (is_checkout = 0 or is_checkout IS NULL) '''
+        where = seq
+        result = cursor.execute(query, seq)
+        print(query)
+        if result > 0:
+            # 계속 진행
+            return True
+
+        # 진행하지 않음
+        return False
+
+    def is_checkout_lesson(self, blog_url: string):
+        query = ''' SELECT is_checkout FROM tb_blog_info WHERE blog_url = %s AND blog_type = 2 '''
+        where = blog_url
+        result = cursor.execute(query, where)
+        data = cursor.fetchone()
+        print(query)
+        if data is None:
+            is_checkout = None
+        else:
+            is_checkout = data['is_checkout']
+
+        return is_checkout
 
 
 mysql = MySQL()

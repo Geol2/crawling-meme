@@ -9,13 +9,15 @@ class TennisBlog(tennisFactory.Tennis):
             url = self.tennis_dict['url'][seq]
             is_exist_blog = db.mysql.is_exist_blog(db.cursor, url)
             if is_exist_blog is True:
-                self.file_logger("등록된 리뷰 블로그가 이미 존재합니다.")
+                # 존재하고 있으면 1로 업데이트
+                db.mysql.set_blog_info(url)
             else:
+                # 존재하지 않으면 insert
                 self.insert_and_increase_tennis_blog(seq)
 
     def insert_and_increase_tennis_blog(self, dict_seq: int):
         self.insert_tennis_blog(dict_seq, 1)
-        self.increase_blog_count()
+        db.mysql.increase_blog_count(db.cursor, self.tennis_idx)
 
     def set_end_flag(self):
         self.set_blog_end_flag()

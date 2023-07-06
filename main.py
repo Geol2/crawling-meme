@@ -1,7 +1,7 @@
 import getopt
 import sys
 
-from libs import common
+from libs import common, db
 from libs import crawling
 
 
@@ -17,6 +17,9 @@ def main(argv):
         return 0
 
     common.logger.info("END CRAWLING")
+    db.cursor.close()
+    db.conn.close()
+
     return 0
 
 if __name__ == "__main__":

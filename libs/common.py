@@ -1,3 +1,5 @@
+import string
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -31,3 +33,7 @@ else:
     file_handler = logging.FileHandler(ROOT_DIR + "/logs/svclog/svc-" + filename + ".log", mode='a+', encoding='utf8')
 
 logger.addHandler(file_handler)  # 핸들러 등록
+
+
+def file_logger(message: string):
+    logger.info(message)
