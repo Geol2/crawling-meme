@@ -77,6 +77,11 @@ class Tennis:
         for i in range(blog_url_length):
             db.mysql.set_blog_info(db.cursor, blog_url[i])
 
+    def set_lesson_info(self, blog_url: []):
+        blog_url_length = len(blog_url)
+        for i in range(blog_url_length):
+            db.mysql.set_lesson_info_by_url(blog_url[i])
+
     def exist_blog(self):
         db.mysql.set_lesson_info()
         return

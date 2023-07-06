@@ -101,7 +101,7 @@ class MySQL:
         print(query)
         return result
 
-    def set_blog_info(self, cursor, blog_url: string):
+    def set_blog_info(self, blog_url: string):
         query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE blog_url = %s AND blog_type = 1 '''
         where = blog_url
         result = cursor.execute(query, where)
@@ -109,10 +109,19 @@ class MySQL:
         return result
 
     def set_lesson_info(self, seq: int):
-        query = '''UPDATE tb_tennis_info SET is_checkout = 1 WHERE seq = %s AND blog_type = 2 '''
+        query = '''UPDATE tb_tennis_info SET is_checkout = 1 WHERE seq = %s '''
         where = seq
         result = cursor.execute(query, where)
         print(query)
+        return result
+
+    def set_lesson_info_by_url(self, url: string):
+        query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE blog_url = %s AND blog_type = 2 '''
+        where = url
+        result = cursor.execute(query, where)
+        print(query)
+        common.file_logger(query)
+
         return result
 
     def set_lesson_list(self, seq: int):

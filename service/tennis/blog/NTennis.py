@@ -25,6 +25,8 @@ class NTennis:
         url = "https://m.place.naver.com/place/" + str(self.naver_place_id) + \
               "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         driver.get(url)
+
+
         return url
 
     def read_next(self, driver):

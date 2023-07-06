@@ -202,7 +202,7 @@ class NaverCrawling(Crawling):
                                                      self.find_write_blog_date(), paging)
                     paging += 1
                     tennis.exist_lesson_blog(data)
-                    tennis.set_blog_info(naver_tennis.tennis_dict["url"])
+                    tennis.set_lesson_info(naver_tennis.tennis_dict["url"])
                     is_eof = naver_tennis.is_eof(self.driver)
                     if is_eof is True:
                         db.mysql.set_lesson_info(tennis.tennis_idx)
@@ -229,7 +229,7 @@ class NaverCrawling(Crawling):
 
 
     # 참고만 합니다
-
+    """
     def tennis_blog_service_new(self):
         rows = db.mysql.get_tennis_info(db.cursor)
         rows_length = len(rows)
@@ -329,4 +329,4 @@ class NaverCrawling(Crawling):
                 db.mysql.increase_blog_count(db.cursor, tennis_idx)
 
         db.cursor.close()
-        db.conn.close()
+        db.conn.close()"""
