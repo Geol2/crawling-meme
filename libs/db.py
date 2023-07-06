@@ -109,7 +109,7 @@ class MySQL:
         return result
 
     def set_lesson_info(self, seq: int):
-        query = '''UPDATE tb_tennis_info SET is_checkout = 1 WHERE seq = %s '''
+        query = '''UPDATE tb_blog_info SET is_checkout = 1 WHERE tennis_idx = %s '''
         where = seq
         result = cursor.execute(query, where)
         print(query)

@@ -55,11 +55,12 @@ class NaverCrawling(Crawling):
         # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
         # 클래스 요소를 이용해서 없거나 있거나를 판단할 수 있지만 잘못된 테니스장 주소가 뜨는 것은 막진 못하고 있습니다.
         try:
-            self.driver.find_element(By.CLASS_NAME, "YouOG")
-            return True
-        except Exception as e:
-            tennis.file_logger("네이버 플레이스 URL 주소가 존재하지 않습니다.")
+            # 페이지를 찾을 수 없다는 곳입니다.
+            self.driver.find_element(By.CLASS_NAME, "MQgGs")
             return False
+        except Exception as e:
+            tennis.file_logger("네이버 플레이스 URL 주소가 있습니다.")
+            return True
 
     def find_blog_url(self):
         # 블로그 링크를 찾는 부분
@@ -189,11 +190,15 @@ class NaverCrawling(Crawling):
             tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
             lesson_seq = rows[i]["seq"]
             tennis.file_logger(str(tennis.tennis_idx))
+            click_count = 0
 
             try:
                 naver_tennis = NTennis(tennis.naver_place_id)
-                naver_tennis.open(self.driver)
+                url = naver_tennis.open(self.driver)
                 paging = 1
+                is_valid = self.is_valid_url(tennis, url)
+                if is_valid is False:
+                    raise Exception("URL을 발견할 수 없습니다.")
 
                 while True:
                     # 블로그 판별
@@ -202,8 +207,8 @@ class NaverCrawling(Crawling):
                                                      self.find_write_blog_date(), paging)
                     paging += 1
                     tennis.exist_lesson_blog(data)
-                    tennis.set_lesson_info(naver_tennis.tennis_dict["url"])
-                    is_eof = naver_tennis.is_eof(self.driver)
+                    # tennis.set_lesson_info(naver_tennis.tennis_dict["url"])
+                    is_eof = naver_tennis.is_eof(self.driver, click_count)
                     if is_eof is True:
                         db.mysql.set_lesson_info(tennis.tennis_idx)
                         db.mysql.set_lesson_list(tennis.tennis_idx)
@@ -211,7 +216,8 @@ class NaverCrawling(Crawling):
                     else:
                         naver_tennis.read_next(self.driver)
             except ProgrammingError as e:
-                print("개발자가 잘못 짬 ^^.. 문법 오류")
+                common.file_logger("개발자가 잘못 짬 ^^.. 문법 오류")
+                exit()
             except Exception as e:
                 db.mysql.unset_lesson_info(lesson_seq)
                 db.mysql.unset_lesson_list(lesson_seq)

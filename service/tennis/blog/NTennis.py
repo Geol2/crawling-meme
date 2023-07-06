@@ -26,7 +26,6 @@ class NTennis:
               "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         driver.get(url)
 
-
         return url
 
     def read_next(self, driver):
@@ -80,11 +79,16 @@ class NTennis:
         # 데이터 가져오기
         return self.data_dict
 
-    def is_eof(self, driver):
+    def is_eof(self, driver, click_count):
         # 끝임을 판단할 함수
+        if click_count > 20:
+            common.file_logger("블로그 카운트 최대치를 넘었습니다. 잘못된 실행으로 인해 종료합니다.")
+            exit()
+
         try:
             # 더보기를 찾았을까?
             driver.find_element(By.CLASS_NAME, "fvwqf")
+            click_count += 1
             time.sleep(2)
             return False
         except NoSuchElementException as e:
