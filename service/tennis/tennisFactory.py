@@ -53,6 +53,19 @@ class Tennis:
         }
         db.mysql.insert_blog(db.cursor, self.tennis_idx, data)
 
+    def insert_tennis_blog_old(self, i: int, blog_type: int):
+        url = self.tennis_dict['url'][i]
+        title = self.tennis_dict['title'][i]
+        w_date = self.tennis_dict['w_date'][i]
+
+        data = {
+            "url": url,
+            "title": title,
+            "w_date": w_date,
+            "blog_type": blog_type
+        }
+        db.mysql.insert_blog(db.cursor, self.tennis_idx, data)
+
     def increase_lesson_count(self):
         db.mysql.increase_lesson_count(db.cursor, self.tennis_idx)
 

@@ -89,5 +89,5 @@ class NTennis:
             common.file_logger("블로그를 모두 보여주었다고 판단합니다.")
             return True
         except RuntimeError as e:
-            common.file_logger("crawling.click_more_blog() 에서 알 수 없는 오류가 발생하였습니다.")
+            common.file_logger("NTennis.is_eof() 에서 알 수 없는 오류가 발생하였습니다.")
             return False

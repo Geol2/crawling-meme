@@ -3,6 +3,7 @@ import math
 import time
 import datetime
 
+from pymysql import ProgrammingError
 from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
@@ -179,10 +180,6 @@ class NaverCrawling(Crawling):
             except Exception as e:
                 tennis.file_logger(e)
 
-        db.cursor.close()
-        db.conn.close()
-
-
     def tennis_lesson_service(self):
         rows = db.mysql.get_lesson_info(db.cursor)
         tennis = None
@@ -195,17 +192,14 @@ class NaverCrawling(Crawling):
 
             try:
                 naver_tennis = NTennis(tennis.naver_place_id)
-                is_continue = db.mysql.search_lesson_list(tennis.tennis_idx)
-                if is_continue is False:
-                    common.file_logger("해당 레슨 테니스장 정보는 넘어갑니다.")
-                    continue
                 naver_tennis.open(self.driver)
                 paging = 1
 
                 while True:
                     # 블로그 판별
-                    data = naver_tennis.set_list_new(self.find_blog_url(), self.find_title(), self.find_write_blog_date(), paging)
-
+                    data = naver_tennis.set_list_new(self.find_blog_url(),
+                                                     self.find_title(),
+                                                     self.find_write_blog_date(), paging)
                     paging += 1
                     tennis.exist_lesson_blog(data)
                     tennis.set_blog_info(naver_tennis.tennis_dict["url"])
@@ -216,6 +210,8 @@ class NaverCrawling(Crawling):
                         break
                     else:
                         naver_tennis.read_next(self.driver)
+            except ProgrammingError as e:
+                print("개발자가 잘못 짬 ^^.. 문법 오류")
             except Exception as e:
                 db.mysql.unset_lesson_info(lesson_seq)
                 db.mysql.unset_lesson_list(lesson_seq)
@@ -236,30 +232,38 @@ class NaverCrawling(Crawling):
 
     def tennis_blog_service_new(self):
         rows = db.mysql.get_tennis_info(db.cursor)
+        rows_length = len(rows)
         tennis = None
 
-        for row in rows:
-            tennis = TennisBlog(row["seq"], row["tennis_name"], row["tennis_naver_id"])
+        for i in range(0, rows_length, 1):
+            tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
+            lesson_seq = rows[i]["seq"]
             tennis.file_logger(str(tennis.tennis_idx))
 
             try:
-                naver_tennis = NTennis(row["tennis_naver_id"])
+                naver_tennis = NTennis(tennis.naver_place_id)
                 naver_tennis.open(self.driver)
                 paging = 1
+
                 while True:
-                    tennis.tennis_dict = naver_tennis.set_list_new(self.find_blog_url(),
-                                                                   self.find_title(),
-                                                                   self.find_write_blog_date(), paging)
+                    # 블로그 판별
+                    data = naver_tennis.set_list_new(self.find_blog_url(), self.find_title(),
+                                                     self.find_write_blog_date(), paging)
+
+                    paging += 1
+                    tennis.exist_lesson_blog(data)
+                    tennis.set_blog_info(naver_tennis.tennis_dict["url"])
                     is_eof = naver_tennis.is_eof(self.driver)
                     if is_eof is True:
-                        tennis.exist_blog()
+                        db.mysql.set_lesson_info(tennis.tennis_idx)
+                        db.mysql.set_lesson_list(tennis.tennis_idx)
                         break
                     else:
-                        naver_tennis.read_next(self.driver, paging)
+                        naver_tennis.read_next(self.driver)
             except Exception as e:
+                db.mysql.unset_lesson_info(lesson_seq)
+                db.mysql.unset_lesson_list(lesson_seq)
                 common.file_logger("tennis_blog_service_new() 에서 알 수 없는 에러가 발생하였습니다.")
-            finally:
-                tennis.update_tennis_info()
 
     def tennis_blog_service_old(self):
         rows = db.mysql.get_lesson_info(db.cursor)
