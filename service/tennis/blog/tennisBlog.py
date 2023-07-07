@@ -16,7 +16,7 @@ class TennisBlog(tennisFactory.Tennis):
                 self.insert_and_increase_tennis_blog(seq)
 
     def insert_and_increase_tennis_blog(self, dict_seq: int):
-        self.insert_tennis_blog(dict_seq, 1)
+        self.insert_tennis_blog_old(dict_seq, 1)
         db.mysql.increase_blog_count(db.cursor, self.tennis_idx)
 
     def set_end_flag(self):
