@@ -27,6 +27,9 @@ class Crawling:
     wait_time = 10
 
     def __init__(self):
+        self.chrome()
+
+    def chrome(self):
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_argument('--no-sandbox')
@@ -208,7 +211,7 @@ class NaverCrawling(Crawling):
                     paging += 1
                     tennis.exist_lesson_blog(data)
                     # tennis.set_lesson_info(naver_tennis.tennis_dict["url"])
-                    is_eof = naver_tennis.is_eof(self.driver, click_count)
+                    is_eof = naver_tennis.is_eof(self.driver, 20)
                     if is_eof is True:
                         db.mysql.set_lesson_info(tennis.tennis_idx)
                         db.mysql.set_lesson_list(tennis.tennis_idx)
