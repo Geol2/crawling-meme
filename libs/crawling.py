@@ -27,6 +27,9 @@ class Crawling:
     wait_time = 10
 
     def __init__(self):
+        self.chrome()
+
+    def chrome(self):
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_argument('--no-sandbox')

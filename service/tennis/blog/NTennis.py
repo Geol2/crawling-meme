@@ -2,7 +2,7 @@ import time
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from libs import common, db
+from libs import common
 
 
 class NTennis:
@@ -56,6 +56,7 @@ class NTennis:
             self.tennis_dict["w_date"].append(date[index])
             index += 1
             self.blog_count += 1
+            common.file_logger("블로그 카운트 : " + str(self.blog_count))
 
         return self.tennis_dict
 
@@ -81,8 +82,8 @@ class NTennis:
 
     def is_eof(self, driver, click_count):
         # 끝임을 판단할 함수
-        if click_count > 20:
-            common.file_logger("블로그 카운트 최대치를 넘었습니다. 잘못된 실행으로 인해 종료합니다.")
+        if click_count >= 20:
+            common.file_logger("블로그 카운트 최대치를 넘었습니다. 잘못된 실행으로 인해 웹 드라이버를 종료합니다.")
             exit()
 
         try:
