@@ -4,21 +4,23 @@ from service.tennis import tennisFactory
 
 class TennisBlog(tennisFactory.Tennis):
 
-    def exist_blog(self):
-        for seq in range(self.total_count):
-            url = self.tennis_dict['url'][seq]
-            is_exist_blog = db.mysql.is_exist_blog(db.cursor, url)
-            if is_exist_blog is True:
+    def exist_blog(self, data: []):
+
+        for i in range(len(data['url'])):
+            url = data['url'][i]
+            is_checkout = db.mysql.is_checkout_blog(url)
+            if is_checkout == 0:
                 # 존재하고 있으면 1로 업데이트
-                db.mysql.set_blog_info(url)
-            else:
-                # 존재하지 않으면 insert
-                self.insert_and_increase_tennis_blog(seq)
+                db.mysql.unset_tennis_info(self.tennis_idx)
+                db.mysql.unset_tennis_list(self.tennis_idx)
+            elif is_checkout == 1:
+                # 한 개의 url에 대해 1을 발견 했을 때, 크롤링이 완료되었다고 판단합니다.
+                self.file_logger("이전에 크롤링이 완료되었습니다. 블로그 리뷰 블로그가 이미 존재합니다.")
+                return True
+            elif is_checkout is None:
+                # 해당 url을 찾을 수 없는 경우입니다. 크롤링하지 않은 데이터로 봅니다.
+                self.insert_and_increase_tennis_blog(data, i)
 
-    def insert_and_increase_tennis_blog(self, dict_seq: int):
-        self.insert_tennis_blog_old(dict_seq, 1)
-        db.mysql.increase_blog_count(db.cursor, self.tennis_idx)
-
-    def set_end_flag(self):
-        self.set_blog_end_flag()
-
+    def insert_and_increase_tennis_blog(self, data, i: int):
+        self.insert_tennis_blog(data, i, 1)
+        db.mysql.increase_blog_count(self.tennis_idx)
