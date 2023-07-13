@@ -39,7 +39,7 @@ class NTennis:
             return
         return
 
-    def set_list_new(self, url: [], title: [], date: [], paging: int):
+    def set_list(self, url: [], title: [], date: [], paging: int):
         if len(url) != len(title) or len(url) != len(date) or len(title) != len(date):
             raise Exception("테니스 정보를 합칠 수 없습니다.")
         if len(self.tennis_dict["url"]) > 0:
@@ -60,7 +60,7 @@ class NTennis:
 
         return self.tennis_dict
 
-    def set_list(self, url: [], title: [], date: []):
+    def set_list_old(self, url: [], title: [], date: []):
         #if len(url) == 0:
         #    raise Exception("테니스장 정보가 존재할 수 없습니다.")
         if len(url) != len(title) or len(url) != len(date) or len(title) != len(date):
