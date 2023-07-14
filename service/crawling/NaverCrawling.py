@@ -1,58 +1,22 @@
-import string
-import math
-import time
 import datetime
+import math
+import string
+import time
 
 from pymysql import ProgrammingError
-from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 
-from libs import config
-from libs import common
-from libs import db
+from libs import db, common
+from service.crawling.crawling import Crawling
 from service.tennis.blog.NTennis import NTennis
 from service.tennis.blog.tennisBlog import TennisBlog
 from service.tennis.blog.tennisLesson import TennisLesson
-
 from service.tennis.tennisFactory import Tennis
 
 
-class Crawling:
-    init = ''
-    driver = None
-
-    wait_time = 10
-
-    def __init__(self):
-        self.chrome()
-
-    def chrome(self):
-        option = webdriver.ChromeOptions()
-        option.add_argument('--headless')
-        option.add_argument('--no-sandbox')
-        option.add_argument('--disable-dev-shm-usage')
-
-        service = Service(executable_path=config.executable_path)
-        # driver = webdriver.Chrome()
-        self.driver = webdriver.Chrome(option, service)
-        self.driver.implicitly_wait(self.wait_time)
-
-    def browser_exit(self):
-        self.driver.quit()
-
-
 class NaverCrawling(Crawling):
-
-    def open_url(self, tennis: Tennis):
-        url = "https://m.place.naver.com/place/" + str(tennis.naver_place_id) + \
-              "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
-        self.driver.get(url)
-
-        self.is_valid_url(tennis, url)
-        return url
 
     def is_valid_url(self, tennis: Tennis, real_url: string):
         # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
@@ -80,26 +44,6 @@ class NaverCrawling(Crawling):
             url_list.append(real_link)
         return url_list
 
-    def click_more_end_blog(self, tennis: Tennis):
-        # 더보기 없어질 때 까지 계속하기
-        is_all_click = False
-        click_count = 0
-
-        while 1:
-            if click_count > 20:
-                is_all_click = True
-                return is_all_click
-
-            if is_all_click is False:
-                is_all_click = self.click_more(tennis)
-                click_count += 1
-            else:
-                return is_all_click
-
-    def click_more_blog(self, tennis: Tennis):
-        # 더보기 한번만 하기
-        self.click_more(tennis)
-
     def click_more(self, tennis: Tennis):
         try:
             a_tag = self.driver.find_element(By.CLASS_NAME, "fvwqf")
@@ -114,11 +58,6 @@ class NaverCrawling(Crawling):
         except RuntimeError as e:
             tennis.file_logger("crawling.click_more_blog() 에서 알 수 없는 오류가 발생하였습니다.")
             return False
-
-    def get_click_number(self, total_count):
-        # 더보기 클릭을 몇 번 해야하는지 찾는 함수
-        # 첫 실행 시, 최대 10개는 노출해주므로 전체에서 1번은 클릭을 해주지 않아도 된다
-        return math.ceil(int(total_count) / 10) - 1
 
     def find_title(self):
         title_list = []
@@ -151,22 +90,6 @@ class NaverCrawling(Crawling):
             converted_date_string = "{}-{:02d}-{:02d}".format(year, month, day)
             date_list.append(converted_date_string)
         return date_list
-
-    def compare_display_blog(self, tennis: Tennis):
-        # 화면상 전체 개수와 데이터베이스 개수가 같은지 다른지 비교하기
-        url_list = self.find_blog_url()
-        blog_info = db.mysql.get_blog_info(tennis, 1)
-        if len(url_list) == blog_info:
-            return True
-        return False
-        # 하다말기
-
-    def compare_display_lesson(self, tennis: Tennis):
-        url_list = self.find_blog_url()
-        lesson_info = db.mysql.get_blog_info(tennis, 2)
-        if len(url_list) == lesson_info:
-            return True
-        return False
 
     def tennis_blog_service(self):
         rows = db.mysql.get_tennis_info(db.cursor)
