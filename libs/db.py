@@ -68,6 +68,19 @@ class MySQL:
 
         return is_checkout
 
+    def is_checkout_lesson(self, blog_url: string):
+        query = ''' SELECT is_checkout FROM tb_blog_info WHERE blog_url = %s AND blog_type = 2 '''
+        where = blog_url
+        result = cursor.execute(query, where)
+        data = cursor.fetchone()
+        print(query)
+        if data is None:
+            is_checkout = None
+        else:
+            is_checkout = data['is_checkout']
+
+        return is_checkout
+    
     def is_exist_lesson(self, url: string):
         query = '''SELECT blog_url FROM `tb_blog_info` WHERE blog_url = %s AND blog_type=2 '''
         where = url
@@ -213,20 +226,6 @@ class MySQL:
 
         # 진행하지 않음
         return False
-
-    def is_checkout_lesson(self, blog_url: string):
-        query = ''' SELECT is_checkout FROM tb_blog_info WHERE blog_url = %s AND blog_type = 2 '''
-        where = blog_url
-        result = cursor.execute(query, where)
-        data = cursor.fetchone()
-        print(query)
-        if data is None:
-            is_checkout = None
-        else:
-            is_checkout = data['is_checkout']
-
-        return is_checkout
-
 
 mysql = MySQL()
 conn = mysql.connect().connection
