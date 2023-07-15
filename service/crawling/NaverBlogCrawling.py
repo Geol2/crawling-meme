@@ -67,7 +67,7 @@ class NaverBlogCrawling(NaverCrawling):
                 common.file_logger("개발자가 잘못 짬 ^^.. 문법 오류")
                 exit()
             except Exception as e:
-                db.mysql.unset_blog_info(tennis.tennis_idx)
+                db.mysql.unset_tennis_info(tennis.tennis_idx)
                 db.mysql.unset_blog_list(tennis.tennis_idx)
                 common.file_logger("알 수 없는 에러 발생")
 
