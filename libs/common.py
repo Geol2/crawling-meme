@@ -1,5 +1,4 @@
 import string
-import time
 from datetime import datetime
 from pathlib import Path
 
@@ -37,3 +36,6 @@ logger.addHandler(file_handler)  # 핸들러 등록
 
 def file_logger(message: string):
     logger.info(message)
+
+def print_logger(message: string):
+    print(message)

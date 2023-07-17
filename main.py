@@ -1,16 +1,18 @@
 import sys
 
 from libs import common, db
-from service.crawling import NaverCrawling
-
+from libs.ExecTime import ExecTime
+from service.crawling.NaverBlogCrawling import NaverBlogCrawling
+from service.crawling.NaverLessonCrawling import NaverLessonCrawling
 
 def main(argv):
+    ctime = ExecTime()
     if argv[1] in ("-blog"):
-        NaverCrawling.NaverCrawling().tennis_blog_service()
-        NaverCrawling.NaverCrawling().browser_exit()
+        NaverBlogCrawling().tennis_blog_service(ctime)
+        NaverBlogCrawling().browser_exit()
     elif argv[1] in ("-lesson"):
-        NaverCrawling.NaverCrawling().tennis_lesson_service()
-        NaverCrawling.NaverCrawling().browser_exit()
+        NaverLessonCrawling().tennis_lesson_service()
+        NaverLessonCrawling().browser_exit()
     elif argv[1] in ("-url"):
         # 특정 url을 가져와서 크롤링하기
         return 0

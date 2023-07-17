@@ -1,23 +1,7 @@
-import string
-import math
-import time
-import datetime
-
-from pymysql import ProgrammingError
 from selenium import webdriver
-from selenium.common import NoSuchElementException
-from selenium.webdriver import Keys
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
 from libs import config
-from libs import common
-from libs import db
-from service.tennis.blog.NTennis import NTennis
-from service.tennis.blog.tennisBlog import TennisBlog
-from service.tennis.blog.tennisLesson import TennisLesson
-
-from service.tennis.tennisFactory import Tennis
 
 
 class Crawling:
