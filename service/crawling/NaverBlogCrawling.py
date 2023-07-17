@@ -32,11 +32,11 @@ class NaverBlogCrawling(NaverCrawling):
 
                 ctime.start_time()
                 is_valid = self.is_valid_url(tennis, url)
+                ctime.end_time()
+                ctime.diff("valid_url")
                 if is_valid is False:
                     common.file_logger("URL을 발견할 수 없습니다.")
                     continue
-                ctime.end_time()
-                ctime.diff("valid_url")
 
                 while True:
                     ctime.start_time()
@@ -49,11 +49,17 @@ class NaverBlogCrawling(NaverCrawling):
                     ctime.diff("set_data")
 
                     paging += 1
+                    ctime.start_time()
                     is_continue = tennis.exist_blog(data)
+                    ctime.end_time()
+                    ctime.diff("exist_blog")
                     if is_continue is True:
                         break
 
+                    ctime.start_time()
                     is_eof = naver_tennis.is_eof(self.driver, click_count)
+                    ctime.end_time()
+                    ctime.diff("is_eof")
                     if is_eof is True:
                         db.mysql.set_blog_info(tennis.tennis_idx)
                         db.mysql.set_blog_list(tennis.tennis_idx)
