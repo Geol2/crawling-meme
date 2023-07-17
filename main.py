@@ -11,7 +11,7 @@ def main(argv):
         NaverBlogCrawling().tennis_blog_service(ctime)
         NaverBlogCrawling().browser_exit()
     elif argv[1] in ("-lesson"):
-        NaverLessonCrawling().tennis_lesson_service()
+        NaverLessonCrawling().tennis_lesson_service(ctime)
         NaverLessonCrawling().browser_exit()
     elif argv[1] in ("-url"):
         # 특정 url을 가져와서 크롤링하기
