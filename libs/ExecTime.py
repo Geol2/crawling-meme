@@ -8,8 +8,10 @@ class ExecTime:
     time = {
         "total_time": 0.000,
         "browser_open": 0.000,
+        "is_eof": 0.000,
         "valid_url": 0.000,
         "set_data": 0.000,
+        "exist_blog": 0.000,
         "read_next": 0.000,
     }
 
@@ -52,13 +54,17 @@ class ExecTime:
         --------------- Time Printer --------------
         |  total_time(sec)   :    {} sec
         |  browser_open(sec) :    {} sec
+        |  is_eof(sec)       :    {} sec
         |  set_data(sec)     :    {} sec
-        |  valid_url(sec)     :    {} sec
+        |  valid_url(sec)     :   {} sec
+        |  exist_blog(sec)   :    {} sec
         |  read_next(sec)    :    {} sec
         -------------------------------------------'''.format(self.time['total_time'],
                                                               self.time['browser_open'],
+                                                              self.time['is_eof'],
                                                               self.time['set_data'],
                                                               self.time['valid_url'],
+                                                              self.time['exist_blog'],
                                                               self.time['read_next'])
 
         common.file_logger(message)
