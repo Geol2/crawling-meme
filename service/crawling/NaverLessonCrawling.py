@@ -9,42 +9,62 @@ from service.tennis.blog.tennisLesson import TennisLesson
 class NaverLessonCrawling(NaverCrawling):
 
     def tennis_lesson_service(self, ctime):
-        rows = db.mysql.get_lesson_info(db.cursor)
+        rows = db.mysql.get_lesson_info()
         tennis = None
         rows_length = len(rows)
 
         ctime.total_start_time()
 
         for i in range(0, rows_length, 1):
+            ctime.add_count("total_count")
+
             tennis = TennisLesson(rows[i]["seq"], rows[i]["tennis_name"], rows[i]["tennis_naver_id"])
             lesson_seq = rows[i]["seq"]
             tennis.file_logger(str(tennis.tennis_idx))
             click_count = 0
 
             try:
-                naver_tennis = NTennis(tennis.naver_place_id)
+                n_tennis = NTennis(tennis.naver_place_id)
+
                 ctime.start_time()
-                url = naver_tennis.open(self.driver)
+                url = n_tennis.open(self.driver)
                 ctime.end_time()
                 ctime.diff("browser_open")
 
                 paging = 1
 
                 ctime.start_time()
-                is_valid = self.is_valid_url(tennis, url)
+                is_valid = self.is_valid_url(tennis)
                 ctime.end_time()
                 ctime.diff("valid_url")
                 if is_valid is False:
                     common.file_logger("URL을 발견할 수 없습니다.")
+                    ctime.add_count("failed_count")
                     continue
+                ctime.add_count("success_count")
 
                 while True:
                     ctime.start_time()
+                    url_arr = self.find_blog_url()
+                    ctime.end_time()
+                    ctime.diff("find_blog_url")
+
+                    ctime.start_time()
+                    title_element = self.find_title()
+                    ctime.end_time()
+                    ctime.diff("find_title")
+
+                    ctime.start_time()
+                    write_blog_element = self.find_write_blog_date()
+                    ctime.end_time()
+                    ctime.diff("find_write_date")
+
+                    ctime.start_time()
                     # 블로그 판별
-                    data = naver_tennis.set_list(self.find_blog_url(),
-                                                 self.find_title(),
-                                                 self.find_write_blog_date(),
-                                                 paging)
+                    data = n_tennis.set_list(url_arr,
+                                             title_element,
+                                             write_blog_element,
+                                             paging, ctime)
                     ctime.end_time()
                     ctime.diff("set_data")
 
@@ -57,7 +77,7 @@ class NaverLessonCrawling(NaverCrawling):
                         break
 
                     ctime.start_time()
-                    is_eof = naver_tennis.is_eof(self.driver, click_count)
+                    is_eof = n_tennis.is_eof(self.driver, click_count)
                     ctime.end_time()
                     ctime.diff("is_eof")
                     if is_eof is True:
@@ -66,7 +86,8 @@ class NaverLessonCrawling(NaverCrawling):
                         break
                     else:
                         ctime.start_time()
-                        naver_tennis.read_next(self.driver)
+                        n_tennis.read_next(self.driver)
+                        ctime.add_count("click_page_count")
                         ctime.end_time()
                         ctime.diff("read_next")
             except ProgrammingError as e:
@@ -79,4 +100,5 @@ class NaverLessonCrawling(NaverCrawling):
 
         ctime.total_end_time()
         ctime.total_diff()
+        ctime.etc()
         ctime.time_print()
