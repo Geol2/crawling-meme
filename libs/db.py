@@ -26,13 +26,13 @@ class MySQL:
             exit(0)
 
     def get_tennis_info(self, cursor):
-        query = "SELECT * FROM tb_tennis_info WHERE run_state = 1"
+        query = "SELECT * FROM tb_tennis_info WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
         cursor.execute(query)
         data = cursor.fetchall()
         return data
 
     def get_lesson_info(self, cursor):
-        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1 ORDER BY seq ASC"
+        query = "SELECT * FROM tb_lesson_list WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
         cursor.execute(query)
         data = cursor.fetchall()
         return data
