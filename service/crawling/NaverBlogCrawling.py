@@ -25,14 +25,14 @@ class NaverBlogCrawling(NaverCrawling):
                 n_tennis = NTennis(tennis.naver_place_id)
 
                 ctime.start_time()
-                url = n_tennis.open(self.driver)
+                url, wait = n_tennis.open(self.driver)
                 ctime.end_time()
                 ctime.diff("browser_open")
 
                 paging = 1
 
                 ctime.start_time()
-                is_valid = self.is_valid_url(tennis)
+                is_valid = self.is_valid_url(tennis, wait)
                 ctime.end_time()
                 ctime.diff("valid_url")
                 if is_valid is False:
@@ -43,26 +43,13 @@ class NaverBlogCrawling(NaverCrawling):
 
                 while True:
                     ctime.start_time()
-                    url_arr = self.find_blog_url()
+                    data_list = self.find_review_element(wait)
                     ctime.end_time()
-                    ctime.diff("find_blog_url")
-
-                    ctime.start_time()
-                    title_element = self.find_title()
-                    ctime.end_time()
-                    ctime.diff("find_title")
-
-                    ctime.start_time()
-                    write_blog_element = self.find_write_blog_date()
-                    ctime.end_time()
-                    ctime.diff("find_write_date")
+                    ctime.diff("find_review_element")
 
                     ctime.start_time()
                     # 블로그 판별
-                    data = n_tennis.set_list(url_arr,
-                                             title_element,
-                                             write_blog_element,
-                                             paging, ctime)
+                    data = n_tennis.set_list(data_list, paging, ctime)
                     ctime.end_time()
                     ctime.diff("set_data")
 

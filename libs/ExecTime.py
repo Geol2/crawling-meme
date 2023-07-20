@@ -11,9 +11,7 @@ class ExecTime:
         "is_eof": 0.000,
         "valid_url": 0.000,
         "set_data": 0.000,
-        "find_blog_url": 0.000,
-        "find_title": 0.000,
-        "find_write_date": 0.000,
+        "find_review_element": 0.000,
         "exist_blog": 0.000,
         "read_next": 0.000,
         "etc": 0.000
@@ -69,9 +67,7 @@ class ExecTime:
                 self.time['browser_open']
                 + self.time['is_eof']
                 + self.time['set_data']
-                + self.time['find_blog_url']
-                + self.time['find_title']
-                + self.time['find_write_date']
+                + self.time['find_review_element']
                 + self.time['valid_url']
                 + self.time['exist_blog']
                 + self.time['read_next']
@@ -83,15 +79,13 @@ class ExecTime:
             ┌───────────────────────────────────────────────────────┐
             ├───────────────── ▶ Time Printer ◀ ────────────────────┤
             ├───────────────────────────────────────────────────────┤
-            │  browser_open (sec)         :    {} sec             
-            │  is_eof (sec)               :    {} sec             
-            │  set_data (sec)             :    {} sec             
-            │    ├ find_blog_url (sec)    :    {} sec             
-            │    ├ find_title (sec)       :    {} sec             
-            │    └ find_write_date(sec)   :    {} sec             
-            │  valid_url (sec)            :    {} sec             
-            │  exist_blog (sec)           :    {} sec             
-            │  read_next (sec)            :    {} sec             
+            │  browser_open (sec)             :    {} sec             
+            │  is_eof (sec)                   :    {} sec             
+            │  set_data (sec)                 :    {} sec               
+            │    └ find_review_element(sec)   :    {} sec             
+            │  valid_url (sec)                :    {} sec             
+            │  exist_blog (sec)               :    {} sec             
+            │  read_next (sec)                :    {} sec             
             ├─────────────────── ▶ Result ◀ ────────────────────────
             │  total_time (sec)           :    {} sec
             │  etc (sec)                  :    {} sec
@@ -104,9 +98,7 @@ class ExecTime:
                 round(self.time['browser_open'], 3),
                 round(self.time['is_eof'], 3),
                 round(self.time['set_data'], 3),
-                round(self.time['find_blog_url'], 3),
-                round(self.time['find_title'], 3),
-                round(self.time['find_write_date'], 3),
+                round(self.time['find_review_element'], 3),
                 round(self.time['valid_url'], 3),
                 round(self.time['exist_blog'], 3),
                 round(self.time['read_next'], 3),
