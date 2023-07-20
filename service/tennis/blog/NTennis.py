@@ -35,7 +35,7 @@ class NTennis:
 
         return url, wait
 
-    def read_next(self, driver):
+    def read_next(self, driver, wait: WebDriverWait):
         # 더보기 실행
         try:
             a = driver.find_element(By.CLASS_NAME, "fvwqf") # 더보기를 찾았을까?
@@ -70,7 +70,7 @@ class NTennis:
         # 데이터 가져오기
         return self.tennis_dict
 
-    def is_eof(self, driver, click_count):
+    def is_eof(self, driver, click_count, wait: WebDriverWait):
         # 끝임을 판단할 함수
         if click_count >= 20:
             common.file_logger("블로그 카운트 최대치를 넘었습니다. 잘못된 실행으로 인해 웹 드라이버를 종료합니다.")
@@ -78,7 +78,7 @@ class NTennis:
 
         try:
             # 더보기를 찾았을까?
-            driver.find_element(By.CLASS_NAME, "fvwqf")
+            wait.until(driver.find_element(By.CLASS_NAME, "fvwqf"))
             click_count += 1
             return False
         except NoSuchElementException as e:
