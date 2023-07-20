@@ -62,7 +62,7 @@ class NaverBlogCrawling(NaverCrawling):
                         break
 
                     ctime.start_time()
-                    is_eof = n_tennis.is_eof(self.driver, click_count)
+                    is_eof = n_tennis.is_eof(self.driver, click_count, wait)
                     ctime.end_time()
                     ctime.diff("is_eof")
                     if is_eof is True:
@@ -71,7 +71,7 @@ class NaverBlogCrawling(NaverCrawling):
                         break
                     else:
                         ctime.start_time()
-                        n_tennis.read_next(self.driver)
+                        n_tennis.read_next(self.driver, wait)
                         ctime.add_count("click_page_count")
                         ctime.end_time()
                         ctime.diff("read_next")
