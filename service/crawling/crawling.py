@@ -8,7 +8,7 @@ class Crawling:
     init = ''
     driver = None
 
-    wait_time = 10
+    wait_time = 5
 
     def __init__(self):
         self.chrome()

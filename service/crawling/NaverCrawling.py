@@ -7,6 +7,7 @@ from pymysql import ProgrammingError
 from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from libs import db, common
 from service.crawling.crawling import Crawling
@@ -18,64 +19,42 @@ from service.tennis.tennisFactory import Tennis
 
 class NaverCrawling(Crawling):
 
-    def is_valid_url(self, tennis: Tennis):
+    def is_valid_url(self, tennis: Tennis, wait: WebDriverWait):
         # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
         # 클래스 요소를 이용해서 없거나 있거나를 판단할 수 있지만 잘못된 테니스장 주소가 뜨는 것은 막진 못하고 있습니다.
         try:
             # 페이지를 찾을 수 없는 것보다 있는 것을 찾는 것이 아무래도 빠릅니다.
-            self.driver.find_element(By.CLASS_NAME, "tAvTy")
+            wait.until(self.driver.find_element(By.CLASS_NAME, "tAvTy"))
             return True
         except Exception as e:
             tennis.file_logger("네이버 플레이스 URL 주소가 없습니다.")
             return False
 
-    def find_blog_url(self):
-        # 블로그 링크를 찾는 부분
+    def find_review_element(self, wait: WebDriverWait):
+        list = {
+            "url": [],
+            "title": [],
+            "date": []
+        }
 
-        url_list = []
-        blog_link = self.driver.find_elements(By.CLASS_NAME, "xg2_q")
-        blog_link_count = len(blog_link)
+        reviews = wait.until(self.driver.find_elements(By.CLASS_NAME, "xg2_q"))
+        reviews_count = len(reviews)
 
-        for i in range(blog_link_count):
-            a_tag = blog_link[i].find_element(By.TAG_NAME, "a")
+        for i in range(reviews_count):
+            # url 데이터 넣기
+            a_tag = wait.until(reviews[i].find_element(By.TAG_NAME, "a"))
             real_link = a_tag.get_property("href")
             if "?" in real_link:  # query string 을 만나면 추가하지 않기
                 real_link_parts = real_link.split("?")
                 real_link = real_link_parts[0]
-            url_list.append(real_link)
+            list["url"].append(real_link)
 
+            # title 데이터 넣기
+            contents = wait.until(reviews[i].find_element(By.CLASS_NAME, "kT8X8"))
+            list['title'].append(wait.until(contents.find_element(By.CLASS_NAME, "hPTBw").text))
 
-        return url_list
-
-    def click_more(self, tennis: Tennis):
-        try:
-            a_tag = self.driver.find_element(By.CLASS_NAME, "fvwqf")
-            # a_tag.click()
-            a_tag.send_keys(Keys.ENTER)
-            tennis.file_logger("더보기 버튼이 실행되었습니다.")
-            time.sleep(2)
-            return False
-        except NoSuchElementException as e:
-            tennis.file_logger("블로그를 모두 보여주었다고 판단합니다.")
-            return True
-        except RuntimeError as e:
-            tennis.file_logger("crawling.click_more_blog() 에서 알 수 없는 오류가 발생하였습니다.")
-            return False
-
-    def find_title(self):
-        title_list = []
-        review_list = self.driver.find_elements(By.CLASS_NAME, "s2opK")
-        for i in range(len(review_list)):
-            title = review_list[i].find_element(By.TAG_NAME, "span").text
-            title_list.append(title)
-
-        return title_list
-
-    def find_write_blog_date(self):
-        date_list = []
-        date_element = self.driver.find_elements(By.CLASS_NAME, "FYQ74")
-        for i in range(len(date_element)):
-            write_date_element = date_element[i].find_element(By.TAG_NAME, "span")
+            # 날짜 찾는 부분
+            write_date_element = wait.until(contents.find_element(By.CLASS_NAME, "ZeWU8"))
             write_date_text = write_date_element.text
             write_date_parts = write_date_text.split(".")
 
@@ -91,5 +70,6 @@ class NaverCrawling(Crawling):
                 year = current_year
                 weekday = write_date_parts[2]
             converted_date_string = "{}-{:02d}-{:02d}".format(year, month, day)
-            date_list.append(converted_date_string)
-        return date_list
+            list["date"].append(converted_date_string)
+
+        return list
