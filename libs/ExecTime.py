@@ -101,7 +101,6 @@ class ExecTime:
             카운팅된 블로그 수 : {} 개
             블로그 더보기 클릭된 수 : {} 번'''.format(
                 round(self.count['total_count'], 3),
-                round(self.time['total_time'], 3),
                 round(self.time['browser_open'], 3),
                 round(self.time['is_eof'], 3),
                 round(self.time['set_data'], 3),
@@ -111,6 +110,7 @@ class ExecTime:
                 round(self.time['valid_url'], 3),
                 round(self.time['exist_blog'], 3),
                 round(self.time['read_next'], 3),
+                round(self.time['total_time'], 3),
                 round(self.time['etc'], 3),
                 round(self.count['success_count'], 3),
                 round(self.count['failed_count'], 3),
