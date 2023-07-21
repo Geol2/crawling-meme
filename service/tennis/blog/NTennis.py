@@ -47,7 +47,7 @@ class NTennis:
 
     def set_list(self, data_list: [], paging: int, ctime: ExecTime):
         if len(data_list['url']) == 0:
-            common.file_logger("list 를 만들 수 없습니다.")
+            raise Exception("테니스 데이터 리스트를 만들 수 없습니다.")
 
         if len(self.tennis_dict["url"]) > 0:
             self.tennis_dict["url"] = []
