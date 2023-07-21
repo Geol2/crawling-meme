@@ -1,7 +1,6 @@
 from pymysql import ProgrammingError
 
 from libs import db, common
-from libs.ExecTime import ExecTime
 from service.crawling.NaverCrawling import NaverCrawling
 from service.tennis.blog.NTennis import NTennis
 from service.tennis.blog.tennisBlog import TennisBlog
@@ -32,7 +31,7 @@ class NaverBlogCrawling(NaverCrawling):
                 paging = 1
 
                 ctime.start_time()
-                is_valid = self.is_valid_url(tennis, wait)
+                is_valid = self.is_valid_url(tennis)
                 ctime.end_time()
                 ctime.diff("valid_url")
                 if is_valid is False:
@@ -43,7 +42,7 @@ class NaverBlogCrawling(NaverCrawling):
 
                 while True:
                     ctime.start_time()
-                    data_list = self.find_review_element(wait)
+                    data_list = self.find_review_element()
                     ctime.end_time()
                     ctime.diff("find_review_element")
 
@@ -62,7 +61,7 @@ class NaverBlogCrawling(NaverCrawling):
                         break
 
                     ctime.start_time()
-                    is_eof = n_tennis.is_eof(self.driver, click_count, wait)
+                    is_eof = n_tennis.is_eof(self.driver, click_count)
                     ctime.end_time()
                     ctime.diff("is_eof")
                     if is_eof is True:
@@ -71,7 +70,7 @@ class NaverBlogCrawling(NaverCrawling):
                         break
                     else:
                         ctime.start_time()
-                        n_tennis.read_next(self.driver, wait)
+                        n_tennis.read_next(self.driver)
                         ctime.add_count("click_page_count")
                         ctime.end_time()
                         ctime.diff("read_next")
