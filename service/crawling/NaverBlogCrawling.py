@@ -1,6 +1,7 @@
 from pymysql import ProgrammingError
 
 from libs import db, common
+from model.tennis.BlogModel import BlogModel
 from service.crawling.NaverCrawling import NaverCrawling
 from service.tennis.blog.NTennis import NTennis
 from service.tennis.blog.tennisBlog import TennisBlog
@@ -9,7 +10,7 @@ from service.tennis.blog.tennisBlog import TennisBlog
 class NaverBlogCrawling(NaverCrawling):
 
     def tennis_blog_service(self, ctime):
-        rows = db.mysql.get_tennis_info()
+        rows = BlogModel().getAll()
         tennis = None
 
         ctime.total_start_time()
