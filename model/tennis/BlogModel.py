@@ -4,7 +4,8 @@ from libs.db import cursor
 
 class BlogModel:
 
-    def getAll(self):
+    @staticmethod
+    def getAll():
         query = "SELECT * FROM tb_tennis_info WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
         cursor.execute(query)
         data = cursor.fetchall()
