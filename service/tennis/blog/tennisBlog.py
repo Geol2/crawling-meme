@@ -4,7 +4,7 @@ from service.tennis import tennisFactory
 
 class TennisBlog(tennisFactory.Tennis):
 
-    def exist_blog(self, data: []):
+    def exist_tennis_blog(self, data: []):
 
         for i in range(len(data['url'])):
             url = data['url'][i]

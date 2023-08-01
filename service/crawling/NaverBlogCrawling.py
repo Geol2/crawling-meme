@@ -55,7 +55,7 @@ class NaverBlogCrawling(NaverCrawling):
 
                     paging += 1
                     ctime.start_time()
-                    is_continue = tennis.exist_blog(data)
+                    is_continue = tennis.exist_tennis_blog(data)
                     ctime.end_time()
                     ctime.diff("exist_blog")
                     if is_continue is True:
