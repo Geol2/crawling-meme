@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from libs import config
 
 
-class Crawling:
+class BrowserHandler:
     init = ''
     driver = None
 

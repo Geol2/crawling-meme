@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
 from libs import common, ExecTime
+from service.crawling.BrowserHandler import BrowserHandler
 
 
 class NTennis:
@@ -20,14 +21,14 @@ class NTennis:
     def __init__(self, naver_place_id: int):
         self.naver_place_id = naver_place_id
 
-    def url_open(self, driver):
+    def url_open(self, handler: BrowserHandler):
         # url 열기
         url = "https://m.place.naver.com/place/" + str(self.naver_place_id) + \
               "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
         #url = "https://m.place.naver.com/place/" + "123123123" + \
         #      "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
-        driver.get(url)
-        wait = WebDriverWait(driver,
+        handler.driver.get(url)
+        wait = WebDriverWait(BrowserHandler.driver,
                              timeout=3,
                              poll_frequency=1,
                              ignored_exceptions=[ElementNotVisibleException,
@@ -35,10 +36,10 @@ class NTennis:
 
         return url, wait
 
-    def read_next(self, driver):
+    def read_next(self, handler: BrowserHandler):
         # 더보기 실행
         try:
-            a = driver.find_element(By.CLASS_NAME, "fvwqf") # 더보기를 찾았을까?
+            a = handler.driver.find_element(By.CLASS_NAME, "fvwqf") # 더보기를 찾았을까?
             a.click()
             time.sleep(0.5)
         except Exception as e:
@@ -71,7 +72,7 @@ class NTennis:
         # 데이터 가져오기
         return self.tennis_dict
 
-    def is_eof(self, driver, click_count):
+    def is_eof(self, handler: BrowserHandler, click_count: int):
         # 끝임을 판단할 함수
         if click_count >= 20:
             common.file_logger("블로그 카운트 최대치를 넘었습니다. 잘못된 실행으로 인해 웹 드라이버를 종료합니다.")
@@ -79,7 +80,7 @@ class NTennis:
 
         try:
             # 더보기를 찾았을까?
-            driver.find_element(By.CLASS_NAME, "fvwqf")
+            handler.driver.find_element(By.CLASS_NAME, "fvwqf")
             click_count += 1
             return False
         except NoSuchElementException as e:

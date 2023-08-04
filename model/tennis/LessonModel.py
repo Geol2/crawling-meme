@@ -1,10 +1,17 @@
+from libs.db import cursor
 
-#class LessonModel:
 
-    #def getAll(self):
+class LessonModel:
 
-    #def one(self, lesson_idx: int):
+    @staticmethod
+    def getAll():
+        query = "SELECT * FROM tb_tennis_info WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
+        cursor.execute(query)
+        data = cursor.fetchall()
+        return data
 
-    #def is_checkout(self, lesson_idx: int):
+    # def one(self, lesson_idx: int):
 
-    #def getListTennisIdx(self, tennis_idx: int):
+    # def is_checkout(self, lesson_idx: int):
+
+    # def getListTennisIdx(self, tennis_idx: int):

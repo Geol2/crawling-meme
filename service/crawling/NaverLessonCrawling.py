@@ -1,6 +1,7 @@
 from pymysql import ProgrammingError
 
 from libs import db, common
+from model.tennis.LessonModel import LessonModel
 from service.crawling.NaverCrawling import NaverCrawling
 from service.tennis.blog.NTennis import NTennis
 from service.tennis.blog.tennisLesson import TennisLesson
@@ -9,7 +10,7 @@ from service.tennis.blog.tennisLesson import TennisLesson
 class NaverLessonCrawling(NaverCrawling):
 
     def tennis_lesson_service(self, ctime):
-        rows = db.mysql.get_lesson_info()
+        rows = LessonModel().getAll()
         tennis = None
         rows_length = len(rows)
 
@@ -19,8 +20,8 @@ class NaverLessonCrawling(NaverCrawling):
         for i in range(0, rows_length, 1):
             open_count += 1
             if open_count >= 150:
-                self.browser_exit()
-                self.chrome()
+                self.handler.browser_exit()
+                self.handler.chrome()
                 open_count = 0
 
             ctime.add_count("total_count")
@@ -34,14 +35,14 @@ class NaverLessonCrawling(NaverCrawling):
                 n_tennis = NTennis(tennis.naver_place_id)
 
                 ctime.start_time()
-                url, wait = n_tennis.url_open(self.driver)
+                url, wait = n_tennis.url_open(self.handler)
                 ctime.end_time()
                 ctime.diff("browser_open")
 
                 paging = 1
 
                 ctime.start_time()
-                is_valid = self.is_valid_url(tennis)
+                is_valid = self.is_valid_url(self.handler, tennis)
                 ctime.end_time()
                 ctime.diff("valid_url")
                 if is_valid is False:
@@ -52,7 +53,7 @@ class NaverLessonCrawling(NaverCrawling):
 
                 while True:
                     ctime.start_time()
-                    data_list = self.find_review_element()
+                    data_list = self.find_review_element(self.handler)
                     ctime.end_time()
                     ctime.diff("find_review_element")
 
@@ -71,7 +72,7 @@ class NaverLessonCrawling(NaverCrawling):
                     #     break
 
                     ctime.start_time()
-                    is_eof = n_tennis.is_eof(self.driver, click_count)
+                    is_eof = n_tennis.is_eof(self.handler, click_count)
                     ctime.end_time()
                     ctime.diff("is_eof")
                     if is_eof is True:
@@ -80,7 +81,7 @@ class NaverLessonCrawling(NaverCrawling):
                         break
                     else:
                         ctime.start_time()
-                        n_tennis.read_next(self.driver)
+                        n_tennis.read_next(self.handler)
                         ctime.add_count("click_page_count")
                         ctime.end_time()
                         ctime.diff("read_next")
@@ -92,6 +93,7 @@ class NaverLessonCrawling(NaverCrawling):
                 db.mysql.unset_lesson_list(lesson_seq)
                 common.file_logger("tennis_blog_service_new() 에서 알 수 없는 에러가 발생하였습니다.")
 
+        self.handler.browser_exit()
         ctime.total_end_time()
         ctime.total_diff()
         ctime.etc()
