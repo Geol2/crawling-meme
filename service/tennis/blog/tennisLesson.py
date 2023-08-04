@@ -8,6 +8,9 @@ class TennisLesson(tennisFactory.Tennis):
 
         for i in range(len(data['url'])):
             url = data['url'][i]
+            title = data['title'][i]
+            w_date = data['w_date'][i]
+
             is_checkout = db.mysql.is_checkout_lesson(url)
             if is_checkout == 0:
                 # 한 개의 url에 대해 0값을 발견 했을 때, idx의 모든 블로그를 0으로 만듭니다.
@@ -19,8 +22,8 @@ class TennisLesson(tennisFactory.Tennis):
                 return True
             elif is_checkout is None:
                 # 해당 url을 찾을 수 없는 경우입니다. 크롤링하지 않은 데이터로 봅니다.
-                self.insert_and_increase_tennis_blog(data, i)
+                self.insert_and_increase_tennis_blog(url, title, w_date)
 
-    def insert_and_increase_tennis_blog(self, data, i: int):
-        self.insert_tennis_blog(data, i, 2)
-        self.increase_lesson_count()
+    def insert_and_increase_tennis_blog(self, url, title, w_date):
+        self.insert_tennis_blog(url, title, w_date, 2)
+        db.mysql.increase_lesson_count(self.tennis_idx)

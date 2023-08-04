@@ -25,12 +25,6 @@ class MySQL:
             common.logger.info(e)
             exit(0)
 
-    def get_tennis_info(self):
-        query = "SELECT * FROM tb_tennis_info WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
-        cursor.execute(query)
-        data = cursor.fetchall()
-        return data
-
     def get_lesson_info(self):
         query = "SELECT * FROM tb_lesson_list WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
         cursor.execute(query)
@@ -57,7 +51,7 @@ class MySQL:
         return False
 
     def is_checkout_blog(self, blog_url: string):
-        query = ''' SELECT is_checkout FROM tb_blog_info WHERE blog_url = %s AND blog_type = 1 '''
+        query = ''' SELECT is_checkout, blog_url FROM tb_blog_info WHERE blog_url = %s AND blog_type = 1 '''
         where = blog_url
         result = cursor.execute(query, where)
         data = cursor.fetchone()
@@ -106,7 +100,7 @@ class MySQL:
         print(query)
         return result
 
-    def increase_lesson_count(self, cursor, tennis_idx: int):
+    def increase_lesson_count(self, tennis_idx: int):
         query = '''UPDATE tb_lesson_list SET blog_cnt = blog_cnt + 1 WHERE seq= %s '''
         where = tennis_idx
         result = cursor.execute(query, where)
@@ -211,7 +205,7 @@ class MySQL:
         where = seq
         result = cursor.execute(query, seq)
         print(query)
-        if len(result) > 0:
+        if result > 0:
             return True
         return False
 
