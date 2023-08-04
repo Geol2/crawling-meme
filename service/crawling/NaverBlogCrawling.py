@@ -11,15 +11,14 @@ class NaverBlogCrawling(NaverCrawling):
 
     def tennis_blog_service(self, ctime):
         rows = BlogModel().getAll()
-        tennis = None
 
         ctime.total_start_time()
         open_count = 0
         for row in rows:
             open_count += 1
             if open_count >= 150:
-                self.browser_exit()
-                self.chrome()
+                self.handler.browser_exit()
+                self.handler.chrome()
                 open_count = 0
 
             ctime.add_count("total_count")
@@ -31,14 +30,14 @@ class NaverBlogCrawling(NaverCrawling):
                 n_tennis = NTennis(tennis.naver_place_id)
 
                 ctime.start_time()
-                url, wait = n_tennis.url_open(self.driver)
+                url, wait = n_tennis.url_open(self.handler)
                 ctime.end_time()
                 ctime.diff("browser_open")
 
                 paging = 1
 
                 ctime.start_time()
-                is_valid = self.is_valid_url(tennis)
+                is_valid = self.is_valid_url(self.handler, tennis)
                 ctime.end_time()
                 ctime.diff("valid_url")
                 if is_valid is False:
@@ -49,7 +48,7 @@ class NaverBlogCrawling(NaverCrawling):
 
                 while True:
                     ctime.start_time()
-                    data_list = self.find_review_element()
+                    data_list = self.find_review_element(self.handler)
                     ctime.end_time()
                     ctime.diff("find_review_element")
 
@@ -68,7 +67,7 @@ class NaverBlogCrawling(NaverCrawling):
                     #    break
 
                     ctime.start_time()
-                    is_eof = n_tennis.is_eof(self.driver, click_count)
+                    is_eof = n_tennis.is_eof(self.handler, click_count)
                     ctime.end_time()
                     ctime.diff("is_eof")
                     if is_eof is True:
@@ -77,7 +76,7 @@ class NaverBlogCrawling(NaverCrawling):
                         break
                     else:
                         ctime.start_time()
-                        n_tennis.read_next(self.driver)
+                        n_tennis.read_next(self.handler)
                         ctime.add_count("click_page_count")
                         ctime.end_time()
                         ctime.diff("read_next")
@@ -89,6 +88,7 @@ class NaverBlogCrawling(NaverCrawling):
                 db.mysql.unset_blog_list(tennis.tennis_idx)
                 common.file_logger("알 수 없는 에러 발생")
 
+        self.handler.browser_exit()
         ctime.total_end_time()
         ctime.total_diff()
         ctime.etc()

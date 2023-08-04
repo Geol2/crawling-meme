@@ -19,7 +19,7 @@ class TennisLesson(tennisFactory.Tennis):
             elif is_checkout == 1:
                 # 한 개의 url에 대해 1을 발견 했을 때, 크롤링이 완료되었다고 판단합니다.
                 self.file_logger("이전에 크롤링이 완료되었습니다. 레슨 리뷰 블로그가 이미 존재합니다.")
-                return True
+                # return True
             elif is_checkout is None:
                 # 해당 url을 찾을 수 없는 경우입니다. 크롤링하지 않은 데이터로 봅니다.
                 self.insert_and_increase_tennis_blog(url, title, w_date)

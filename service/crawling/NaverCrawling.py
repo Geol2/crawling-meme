@@ -3,31 +3,36 @@ import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
-from service.crawling.crawling import Crawling
+from service.crawling.BrowserHandler import BrowserHandler
 from service.tennis.tennisFactory import Tennis
 
 
-class NaverCrawling(Crawling):
+class NaverCrawling:
 
-    def is_valid_url(self, tennis: Tennis):
+    handler = None
+
+    def __init__(self):
+        self.handler = BrowserHandler()
+
+    def is_valid_url(self, handler: BrowserHandler, tennis: Tennis):
         # 해당 url 주소가 잘못되었는지 판단하는 함수입니다.
         # 클래스 요소를 이용해서 없거나 있거나를 판단할 수 있지만 잘못된 테니스장 주소가 뜨는 것은 막진 못하고 있습니다.
         try:
             # 페이지를 찾을 수 없는 것보다 있는 것을 찾는 것이 아무래도 빠릅니다.
-            self.driver.find_elements(By.CLASS_NAME, "tAvTy")
+            handler.driver.find_elements(By.CLASS_NAME, "tAvTy")
             return True
         except Exception as e:
             tennis.file_logger("네이버 플레이스 URL 주소가 없습니다.")
             return False
 
-    def find_review_element(self):
+    def find_review_element(self, handler: BrowserHandler):
         list = {
             "url": [],
             "title": [],
             "date": []
         }
 
-        reviews = self.driver.find_elements(By.CLASS_NAME, "xg2_q")
+        reviews = handler.driver.find_elements(By.CLASS_NAME, "xg2_q")
         reviews_count = len(reviews)
 
         for i in range(reviews_count):
