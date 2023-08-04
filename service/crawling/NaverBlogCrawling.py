@@ -14,8 +14,14 @@ class NaverBlogCrawling(NaverCrawling):
         tennis = None
 
         ctime.total_start_time()
-
+        open_count = 0
         for row in rows:
+            open_count += 1
+            if open_count >= 150:
+                self.browser_exit()
+                self.chrome()
+                open_count = 0
+
             ctime.add_count("total_count")
             tennis = TennisBlog(row["seq"], row["tennis_name"], row["tennis_naver_id"])
             tennis.file_logger(str(tennis.tennis_idx))
@@ -25,7 +31,7 @@ class NaverBlogCrawling(NaverCrawling):
                 n_tennis = NTennis(tennis.naver_place_id)
 
                 ctime.start_time()
-                url, wait = n_tennis.open(self.driver)
+                url, wait = n_tennis.url_open(self.driver)
                 ctime.end_time()
                 ctime.diff("browser_open")
 
@@ -58,8 +64,8 @@ class NaverBlogCrawling(NaverCrawling):
                     is_continue = tennis.exist_tennis_blog(data)
                     ctime.end_time()
                     ctime.diff("exist_blog")
-                    if is_continue is True:
-                        break
+                    #if is_continue is True:
+                    #    break
 
                     ctime.start_time()
                     is_eof = n_tennis.is_eof(self.driver, click_count)

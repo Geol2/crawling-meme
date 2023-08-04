@@ -40,11 +40,7 @@ class Tennis:
             self.tennis_dict["title"].append(title[i])
             self.tennis_dict["w_date"].append(date[i])
 
-    def insert_tennis_blog(self, data: [], i: int, blog_type: int):
-        url = data['url'][i]
-        title = data['title'][i]
-        w_date = data['w_date'][i]
-
+    def insert_tennis_blog(self, url: string, title: string, w_date: string, blog_type: int):
         data = {
             "url": url,
             "title": title,

@@ -20,7 +20,7 @@ class NTennis:
     def __init__(self, naver_place_id: int):
         self.naver_place_id = naver_place_id
 
-    def open(self, driver):
+    def url_open(self, driver):
         # url 열기
         url = "https://m.place.naver.com/place/" + str(self.naver_place_id) + \
               "/review/ugc?entry=pll&zoomLevel=12.000&type=photoView"
@@ -40,6 +40,7 @@ class NTennis:
         try:
             a = driver.find_element(By.CLASS_NAME, "fvwqf") # 더보기를 찾았을까?
             a.click()
+            time.sleep(0.5)
         except Exception as e:
             common.file_logger(" 더보기를 실행할 수 없습니다.")
             return
