@@ -5,7 +5,7 @@ class LessonModel:
 
     @staticmethod
     def getAll():
-        query = "SELECT * FROM tb_tennis_info WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
+        query = "SELECT * FROM tb_tennis_list WHERE run_state = 1 AND tennis_naver_id IS NOT NULL ORDER BY seq"
         cursor.execute(query)
         data = cursor.fetchall()
         return data
