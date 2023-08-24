@@ -51,3 +51,7 @@ pip install pymysql
 ```shell
 python3 main.py -blog # RDBMS에 등록된 네이버 플레이스 전체 크롤링
 ```
+
+
+# UML 다이어그램
+![uml](./etc/readme.png)
