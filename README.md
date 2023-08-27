@@ -53,5 +53,13 @@ python3 main.py -blog # RDBMS에 등록된 네이버 플레이스 전체 크롤�
 ```
 
 
-# UML 다이어그램
-![uml](./etc/readme.png)
+### UML 다이어그램
+![uml](./etc/readme-uml.png)
+
+### 시퀀스 다이어그램
+
+![uml](./etc/readme-sequence.png)
+
+### 아키텍처
+
+![architecture](./etc/architecture.png)

@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-08-24T23:43:47.109Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="_-W4qr6TPFGfqjwQpLQO" version="21.6.8" type="device">
+<mxfile host="Electron" modified="2023-08-27T05:24:14.156Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="dxKtnhbrvlJGJSpZORSQ" version="21.6.8" type="device">
   <diagram name="페이지-1" id="g-WrEwpi7XCB8OCjwPJX">
-    <mxGraphModel dx="1114" dy="999" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="637" dy="571" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -347,6 +347,45 @@
               <mxPoint x="460" y="1880" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-5" value="프로그램" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="950" y="1800" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-6" value="브라우저&lt;br&gt;핸들러" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1800" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-7" value="데이터베이스" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="1270" y="1800" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-8" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="999.5" y="1880" as="sourcePoint" />
+            <mxPoint x="1159.5" y="1880" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-9" value="dispatch &amp;amp; open()" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="1850" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-12" value="parse &amp;amp;&lt;br&gt;data sorted" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="920" y="1930" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-17" value="insert" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="1947" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-18" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1160" y="1920" as="sourcePoint" />
+            <mxPoint x="1000" y="1920" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-20" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1002.75" y="1979" as="sourcePoint" />
+            <mxPoint x="1319.5" y="1979" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Xxh61iNxdo9k6Q9iGmyf-22" value="detect" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="1890" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
