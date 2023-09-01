@@ -5,6 +5,7 @@ from libs.ExecTime import ExecTime
 from service.crawling.NaverBlogCrawling import NaverBlogCrawling
 from service.crawling.NaverLessonCrawling import NaverLessonCrawling
 
+
 def main(argv):
     ctime = ExecTime()
     if argv[1] in ("-blog"):
@@ -21,5 +22,7 @@ def main(argv):
 
     return 0
 
+
 if __name__ == "__main__":
     main(sys.argv)
+    exit(0)
