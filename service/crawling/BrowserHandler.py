@@ -20,9 +20,10 @@ class BrowserHandler:
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--blink-settings=imagesEnabled=false')
 
-        service = Service(executable_path=config.executable_path)
+        # service = Service(executable_path=config.executable_path)
         # driver = webdriver.Chrome()
-        self.driver = webdriver.Chrome(options, service)
+        # self.driver = webdriver.Chrome(options, service)
+        self.driver = webdriver.Chrome(options)
         self.driver.implicitly_wait(self.wait_time)
 
     def browser_exit(self):
