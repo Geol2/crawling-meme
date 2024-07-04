@@ -1,7 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-
-from libs import config
 
 
 class BrowserHandler:
@@ -10,15 +7,13 @@ class BrowserHandler:
 
     wait_time = 3
 
-    def __init__(self):
-        self.chrome()
-
-    def chrome(self):
+    def chrome(self, headless=None):
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless=new')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--blink-settings=imagesEnabled=false')
+        if headless is 'background':
+            options.add_argument('--headless=new')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--blink-settings=imagesEnabled=false')
 
         # service = Service(executable_path=config.executable_path)
         # driver = webdriver.Chrome()
